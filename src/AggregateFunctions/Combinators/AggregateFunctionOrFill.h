@@ -107,8 +107,27 @@ public:
         size_t row_num,
         Arena * arena) const override
     {
-        nested_function->add(place, columns, row_num, arena);
-        place[size_of_data] = 1;
+        /// Check if the nested function is an If combinator
+        /// If so, we need to check the condition before setting the flag
+        const String & nested_name = nested_function->getName();
+        bool is_if_combinator = nested_name.size() >= 2 && nested_name.substr(nested_name.size() - 2) == "If";
+
+        if (is_if_combinator && this->argument_types.size() > 0)
+        {
+            /// For If combinator, the last column is the condition
+            /// Only set the flag if the condition is true
+            const auto & flags = assert_cast<const ColumnUInt8 &>(*columns[this->argument_types.size() - 1]).getData();
+            if (flags[row_num])
+            {
+                nested_function->add(place, columns, row_num, arena);
+                place[size_of_data] = 1;
+            }
+        }
+        else
+        {
+            nested_function->add(place, columns, row_num, arena);
+            place[size_of_data] = 1;
+        }
     }
 
     void addBatch( /// NOLINT
@@ -163,8 +182,29 @@ public:
         {
             if (row_end != row_begin)
             {
-                nested_function->addBatchSinglePlace(row_begin, row_end, place, columns, arena, if_argument_pos);
-                place[size_of_data] = 1;
+                /// Check if the nested function is an If combinator
+                const String & nested_name = nested_function->getName();
+                bool is_if_combinator = nested_name.size() >= 2 && nested_name.substr(nested_name.size() - 2) == "If";
+
+                if (is_if_combinator && this->argument_types.size() > 0)
+                {
+                    /// For If combinator, check if any condition is true before setting the flag
+                    const auto & flags = assert_cast<const ColumnUInt8 &>(*columns[this->argument_types.size() - 1]).getData();
+                    nested_function->addBatchSinglePlace(row_begin, row_end, place, columns, arena, if_argument_pos);
+                    for (size_t i = row_begin; i < row_end; ++i)
+                    {
+                        if (flags[i])
+                        {
+                            place[size_of_data] = 1;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    nested_function->addBatchSinglePlace(row_begin, row_end, place, columns, arena, if_argument_pos);
+                    place[size_of_data] = 1;
+                }
             }
         }
     }
@@ -195,13 +235,34 @@ public:
         {
             if (row_end != row_begin)
             {
-                nested_function->addBatchSinglePlaceNotNull(row_begin, row_end, place, columns, null_map, arena, if_argument_pos);
-                for (size_t i = row_begin; i < row_end; ++i)
+                /// Check if the nested function is an If combinator
+                const String & nested_name = nested_function->getName();
+                bool is_if_combinator = nested_name.size() >= 2 && nested_name.substr(nested_name.size() - 2) == "If";
+
+                if (is_if_combinator && this->argument_types.size() > 0)
                 {
-                    if (!null_map[i])
+                    /// For If combinator, check if any condition is true and value is not null before setting the flag
+                    const auto & flags = assert_cast<const ColumnUInt8 &>(*columns[this->argument_types.size() - 1]).getData();
+                    nested_function->addBatchSinglePlaceNotNull(row_begin, row_end, place, columns, null_map, arena, if_argument_pos);
+                    for (size_t i = row_begin; i < row_end; ++i)
                     {
-                        place[size_of_data] = 1;
-                        break;
+                        if (flags[i] && !null_map[i])
+                        {
+                            place[size_of_data] = 1;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    nested_function->addBatchSinglePlaceNotNull(row_begin, row_end, place, columns, null_map, arena, if_argument_pos);
+                    for (size_t i = row_begin; i < row_end; ++i)
+                    {
+                        if (!null_map[i])
+                        {
+                            place[size_of_data] = 1;
+                            break;
+                        }
                     }
                 }
             }

@@ -22,6 +22,10 @@ public:
         /// Data of all columns is stored in one file. Marks are also stored in single file.
         Compact,
 
+        /// Hybrid row-columnar storage: Wide format + row store column for point queries.
+        /// Combines columnar files with a binary-encoded row store for fast point lookups.
+        Hybrid,
+
         Unknown,
     };
 

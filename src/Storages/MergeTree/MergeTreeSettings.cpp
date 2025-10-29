@@ -1936,6 +1936,32 @@ namespace ErrorCodes
     Minimal size (uncompressed bytes) to prewarm mark cache and primary index cache
     for new parts
     )", 0) \
+    /** Row store settings (hybrid row-columnar storage). */ \
+    DECLARE(Bool, enable_row_store, false, R"(
+    Enable hybrid row-columnar storage. When enabled, a hidden row store column
+    is created alongside regular columnar storage to accelerate point queries
+    on wide tables. This increases storage size but dramatically improves
+    SELECT * WHERE pk=? query performance.
+    )", 0) \
+    DECLARE(UInt64, row_store_page_size, 65536, R"(
+    Page size for row store in bytes. Rows are grouped into pages and compressed
+    together. Larger pages provide better compression but higher read latency.
+    Default is 64KB.
+    )", 0) \
+    DECLARE(String, row_store_compression_codec, "LZ4", R"(
+    Compression codec for row store pages. Supported values: LZ4, ZSTD, NONE.
+    LZ4 provides good balance of speed and compression. ZSTD provides better
+    compression at cost of CPU. Default is LZ4.
+    )", 0) \
+    DECLARE(Float, row_store_min_columns_ratio_for_point_query, 0.8f, R"(
+    Minimum ratio of columns that must be requested to use row store for point
+    queries. If query requests fewer columns, columnar storage is used instead.
+    Value 0.8 means query must request at least 80% of columns. Range: 0.0-1.0.
+    )", 0) \
+    DECLARE(Bool, enable_row_store_for_point_queries, true, R"(
+    Enable automatic detection and optimization of point queries using row store.
+    When disabled, row store is still written but not used for reads.
+    )", 0) \
     /** Projection settings. */ \
     DECLARE(UInt64, max_projections, 25, R"(
     The maximum number of merge tree projections.

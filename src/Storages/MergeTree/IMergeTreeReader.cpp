@@ -514,6 +514,8 @@ MergeTreeReaderPtr createMergeTreeReader(
             avg_value_size_hints,
             profile_callback);
 
+    /// Hybrid parts are treated as Wide parts for reading
+    /// (isWidePart returns true for Hybrid parts)
     if (read_info->isWidePart())
         return createMergeTreeReaderWide(
             read_info,

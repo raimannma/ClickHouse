@@ -352,6 +352,10 @@ static void incrementTypeMetric(MergeTreeDataPartType type)
         case MergeTreeDataPartType::Compact:
             CurrentMetrics::add(CurrentMetrics::PartsCompact);
             return;
+        case MergeTreeDataPartType::Hybrid:
+            /// Hybrid parts are counted as Wide parts
+            CurrentMetrics::add(CurrentMetrics::PartsWide);
+            return;
         case MergeTreeDataPartType::Unknown:
             return;
     }
@@ -366,6 +370,10 @@ static void decrementTypeMetric(MergeTreeDataPartType type)
             return;
         case MergeTreeDataPartType::Compact:
             CurrentMetrics::sub(CurrentMetrics::PartsCompact);
+            return;
+        case MergeTreeDataPartType::Hybrid:
+            /// Hybrid parts are counted as Wide parts
+            CurrentMetrics::sub(CurrentMetrics::PartsWide);
             return;
         case MergeTreeDataPartType::Unknown:
             return;
@@ -2746,7 +2754,7 @@ bool isCompactPart(const MergeTreeDataPartPtr & data_part)
 
 bool isWidePart(const MergeTreeDataPartPtr & data_part)
 {
-    return (data_part && data_part->getType() == MergeTreeDataPartType::Wide);
+    return (data_part && (data_part->getType() == MergeTreeDataPartType::Wide || data_part->getType() == MergeTreeDataPartType::Hybrid));
 }
 
 bool isCompressedFromIndexExtension(const String & index_extension)

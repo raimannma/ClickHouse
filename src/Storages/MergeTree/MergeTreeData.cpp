@@ -274,6 +274,7 @@ namespace MergeTreeSetting
     extern const MergeTreeSettingsMergeTreeSerializationInfoVersion serialization_info_version;
     extern const MergeTreeSettingsMergeTreeStringSerializationVersion string_serialization_version;
     extern const MergeTreeSettingsUInt32 min_level_for_wide_part;
+    extern const MergeTreeSettingsBool enable_row_store;
 }
 
 namespace ServerSetting
@@ -4520,6 +4521,10 @@ MergeTreeDataPartFormat MergeTreeData::choosePartFormat(size_t bytes_uncompresse
     auto part_type = PartType::Wide;
     if (satisfies((*settings)[MergeTreeSetting::min_bytes_for_wide_part], (*settings)[MergeTreeSetting::min_rows_for_wide_part], (*settings)[MergeTreeSetting::min_level_for_wide_part]))
         part_type = PartType::Compact;
+
+    /// Use Hybrid format if row store is enabled and part would be Wide
+    if (part_type == PartType::Wide && (*settings)[MergeTreeSetting::enable_row_store])
+        part_type = PartType::Hybrid;
 
     return {part_type, PartStorageType::Full};
 }

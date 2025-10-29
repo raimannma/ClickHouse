@@ -3,6 +3,7 @@
 #include <Storages/MergeTree/IMergeTreeDataPartWriter.h>
 #include <Storages/MergeTree/MergeTreeIndexGranularity.h>
 #include <Storages/MergeTree/MergeTreeSettings.h>
+#include <Storages/MergeTree/RowStore/MergeTreeDataPartWriterHybrid.h>
 #include <Storages/StorageInMemoryMetadata.h>
 #include <Common/MemoryTrackerBlockerInThread.h>
 
@@ -217,6 +218,23 @@ MergeTreeDataPartWriterPtr createMergeTreeDataPartWriter(
             std::move(computed_index_granularity));
     if (part_type == MergeTreeDataPartType::Wide)
         return createMergeTreeDataPartWideWriter(
+            data_part_name_,
+            logger_name_,
+            serializations_,
+            data_part_storage_,
+            index_granularity_info_,
+            storage_settings_,
+            columns_list,
+            metadata_snapshot,
+            virtual_columns,
+            indices_to_recalc,
+            stats_to_recalc_,
+            marks_file_extension_,
+            default_codec_,
+            writer_settings,
+            std::move(computed_index_granularity));
+    if (part_type == MergeTreeDataPartType::Hybrid)
+        return std::make_unique<MergeTreeDataPartWriterHybrid>(
             data_part_name_,
             logger_name_,
             serializations_,

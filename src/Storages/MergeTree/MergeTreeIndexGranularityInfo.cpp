@@ -96,6 +96,9 @@ std::string MarkType::getFileExtension() const
             return res + "2";
         case MergeTreeDataPartType::Compact:
             return res + (with_substreams ? "4" : "3");
+        case MergeTreeDataPartType::Hybrid:
+            /// Hybrid parts use the same mark format as Wide parts
+            return res + "2";
         case MergeTreeDataPartType::Unknown:
             throw Exception(ErrorCodes::LOGICAL_ERROR, "Unknown data part type");
     }

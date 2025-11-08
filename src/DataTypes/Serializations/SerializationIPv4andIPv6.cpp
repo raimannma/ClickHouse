@@ -148,14 +148,20 @@ void SerializationIP<IPv>::deserializeBinary(DB::Field & field, DB::ReadBuffer &
 template <typename IPv>
 void SerializationIP<IPv>::serializeBinary(const DB::IColumn & column, size_t row_num, DB::WriteBuffer & ostr, const DB::FormatSettings &) const
 {
-    writeBinary(assert_cast<const ColumnVector<IPv> &>(column).getData()[row_num], ostr);
+    if constexpr (std::is_same_v<IPv, IPv6>)
+        writeBinary(assert_cast<const ColumnVector<IPv> &>(column).getData()[row_num], ostr);
+    else
+        writeBinaryLittleEndian(assert_cast<const ColumnVector<IPv> &>(column).getData()[row_num], ostr);
 }
 
 template <typename IPv>
 void SerializationIP<IPv>::deserializeBinary(DB::IColumn & column, DB::ReadBuffer & istr, const DB::FormatSettings &) const
 {
     IPv x;
-    readBinary(x.toUnderType(), istr);
+    if constexpr (std::is_same_v<IPv, IPv6>)
+        readBinary(x.toUnderType(), istr);
+    else
+        readBinaryLittleEndian(x, istr);
     assert_cast<ColumnVector<IPv> &>(column).getData().push_back(x);
 }
 

@@ -116,6 +116,7 @@ void MergeTreeIndexAggregatorBloomFilterText::update(const Block & block, size_t
     {
         const auto & column_with_type = block.getByName(index_columns[col]);
         const auto & column = column_with_type.column;
+        auto & bloom_filter = granule->bloom_filters[col];
         size_t current_position = *pos;
 
         if (isArray(column_with_type.type))
@@ -132,7 +133,7 @@ void MergeTreeIndexAggregatorBloomFilterText::update(const Block & block, size_t
                 for (size_t row_num = 0; row_num < elements_size; ++row_num)
                 {
                     auto ref = column_key.getDataAt(element_start_row + row_num);
-                    forEachTokenToBloomFilter(*tokenizer, ref.data(), ref.size(), granule->bloom_filters[col]);
+                    forEachTokenToBloomFilter(*tokenizer, ref.data(), ref.size(), bloom_filter);
                 }
 
                 current_position += 1;
@@ -143,7 +144,7 @@ void MergeTreeIndexAggregatorBloomFilterText::update(const Block & block, size_t
             for (size_t i = 0; i < rows_read; ++i)
             {
                 auto ref = column->getDataAt(current_position + i);
-                forEachTokenToBloomFilter(*tokenizer, ref.data(), ref.size(), granule->bloom_filters[col]);
+                forEachTokenToBloomFilter(*tokenizer, ref.data(), ref.size(), bloom_filter);
             }
         }
     }

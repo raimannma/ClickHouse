@@ -560,10 +560,10 @@ struct MergeTreeIndexAggregatorText final : IMergeTreeIndexAggregator
 private:
     /// Iterates over a ColumnArray(String) slice and calls addDocument<tokenize> on each element.
     template <bool tokenize>
-    void addDocumentsFromArray(ColumnPtr column, size_t start_row, size_t rows_read);
+    void addDocumentsFromArray(const ColumnPtr & column, size_t start_row, size_t rows_read);
 
     /// One token per `(key, value)` pair of a ColumnMap slice. `keyValuePairs` only.
-    void addDocumentsFromMap(ColumnPtr column, size_t start_row, size_t rows_read);
+    void addDocumentsFromMap(const ColumnPtr & column, size_t start_row, size_t rows_read);
 
     String index_column_name;
     MergeTreeIndexTextParams params;

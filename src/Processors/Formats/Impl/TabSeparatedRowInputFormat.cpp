@@ -264,7 +264,7 @@ bool TabSeparatedFormatReader::parseRowEndWithDiagnosticInfo(WriteBuffer & out)
     return true;
 }
 
-void TabSeparatedFormatReader::checkNullValueForNonNullable(DataTypePtr type)
+void TabSeparatedFormatReader::checkNullValueForNonNullable(const DataTypePtr & type)
 {
     bool can_be_parsed_as_null = isNullableOrLowCardinalityNullable(type) || format_settings.null_as_default;
 

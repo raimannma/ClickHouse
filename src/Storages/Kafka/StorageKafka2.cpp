@@ -1138,13 +1138,19 @@ std::optional<StorageKafka2::BlocksAndGuard> StorageKafka2::pollConsumer(
                 }
             }
 
+            const auto topic = msg_info.currentTopic();
+            const auto key = msg_info.currentKey();
+            const auto offset = msg_info.currentOffset();
+            const auto partition = msg_info.currentPartition();
+            const auto table_name = getStorageID().getTableName();
+            const auto error_mode = getHandleKafkaErrorMode();
+
             for (size_t i = 0; i < new_rows; ++i)
             {
-                virtual_columns[0]->insert(msg_info.currentTopic());
-                virtual_columns[1]->insert(msg_info.currentKey());
-                virtual_columns[2]->insert(msg_info.currentOffset());
-                virtual_columns[3]->insert(msg_info.currentPartition());
-
+                virtual_columns[0]->insert(topic);
+                virtual_columns[1]->insert(key);
+                virtual_columns[2]->insert(offset);
+                virtual_columns[3]->insert(partition);
 
                 auto timestamp_raw = msg_info.currentTimestamp();
                 if (timestamp_raw)
@@ -1161,9 +1167,9 @@ std::optional<StorageKafka2::BlocksAndGuard> StorageKafka2::pollConsumer(
                 }
                 virtual_columns[6]->insert(headers_names);
                 virtual_columns[7]->insert(headers_values);
-                virtual_columns[8]->insert(getStorageID().getTableName());
+                virtual_columns[8]->insertData(table_name.data(), table_name.size());
 
-                if (getHandleKafkaErrorMode() == StreamingHandleErrorMode::STREAM)
+                if (error_mode == StreamingHandleErrorMode::STREAM)
                 {
                     if (exception_message)
                     {

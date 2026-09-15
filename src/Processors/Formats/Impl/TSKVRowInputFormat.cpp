@@ -145,7 +145,7 @@ bool TSKVRowInputFormat::readRow(MutableColumns & columns, RowReadExtension & ex
                         throw Exception(ErrorCodes::INCORRECT_DATA, "Duplicate field found while parsing TSKV format: {}", name_ref);
 
                     seen_columns[index] = read_columns[index] = true;
-                    const auto & type = getPort().getHeader().getByPosition(index).type;
+                    const auto & type = header.getByPosition(index).type;
                     const auto & serialization = serializations[index];
                     if (format_settings.null_as_default && !isNullableOrLowCardinalityNullable(type))
                         read_columns[index] = SerializationNullable::deserializeNullAsDefaultOrNestedTextEscaped(*columns[index], *in, format_settings, serialization);

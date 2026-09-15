@@ -883,11 +883,11 @@ AvroDeserializer::DeserializeFn AvroDeserializer::createDeserializeFn(const avro
                 const auto & values_type = map_type.getValueType();
                 auto keys_source_type = root_node->leafAt(0);
                 auto values_source_type = root_node->leafAt(1);
-                auto keys_deserializer = [keys_type, this](IColumn & column, avro::Decoder & decoder)
+                auto keys_deserializer = [keys_serialization = keys_type->getDefaultSerialization(), this](IColumn & column, avro::Decoder & decoder)
                 {
                     String key = decoder.decodeString();
                     ReadBufferFromString buf(key);
-                    keys_type->getDefaultSerialization()->deserializeWholeText(column, buf, settings);
+                    keys_serialization->deserializeWholeText(column, buf, settings);
                     return true;
                 };
 

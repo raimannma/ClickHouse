@@ -62,6 +62,10 @@ void PostgreSQLOutputFormat::consume(Chunk chunk)
     if (isCancelled())
         throw Exception(ErrorCodes::QUERY_WAS_CANCELLED, "Query was cancelled");
 
+    const Columns & columns = chunk.getColumns();
+    VectorWithMemoryTracking<std::shared_ptr<PostgreSQLProtocol::Messaging::ISerializable>> row;
+    row.reserve(chunk.getNumColumns());
+
     for (size_t i = 0; i != chunk.getNumRows(); ++i)
     {
         /// Check for cancellation periodically, use throw instead of return.
@@ -79,10 +83,7 @@ void PostgreSQLOutputFormat::consume(Chunk chunk)
             });
         }
 
-        const Columns & columns = chunk.getColumns();
-        VectorWithMemoryTracking<std::shared_ptr<PostgreSQLProtocol::Messaging::ISerializable>> row;
-        row.reserve(chunk.getNumColumns());
-
+        row.clear();
         for (size_t j = 0; j != chunk.getNumColumns(); ++j)
         {
             if (columns[j]->isNullAt(i))

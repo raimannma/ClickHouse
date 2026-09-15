@@ -272,7 +272,7 @@ MergeTreeSelectProcessor::readCurrentTask(MergeTreeReadTask & current_task, IMer
         ordered_columns.reserve(result_header.columns());
         for (size_t i = 0; i < result_header.columns(); ++i)
         {
-            auto name = result_header.getByPosition(i).name;
+            const auto & name = result_header.getByPosition(i).name;
             ordered_columns.push_back(res.block.getByName(name).column);
         }
 

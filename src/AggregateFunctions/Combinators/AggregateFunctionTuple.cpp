@@ -157,7 +157,7 @@ void AggregateFunctionTuple::add(AggregateDataPtr __restrict place, const IColum
     /// row 0 (a sparse element is cut from its dense values column at the translated index); an
     /// element with no sparse columns is passed through unchanged.
     size_t num_tuples = argument_types.size();
-    Columns holders(num_tuples);
+    Columns holders;
     ColumnRawPtrs nested_columns(num_tuples);
     for (size_t i = 0; i < nested_functions.size(); ++i)
     {
@@ -171,6 +171,7 @@ void AggregateFunctionTuple::add(AggregateDataPtr __restrict place, const IColum
         size_t nested_row = row_num;
         if (has_sparse)
         {
+            holders.resize(num_tuples);
             for (size_t k = 0; k < num_tuples; ++k)
             {
                 if (const auto * sparse = typeid_cast<const ColumnSparse *>(nested_columns[k]))

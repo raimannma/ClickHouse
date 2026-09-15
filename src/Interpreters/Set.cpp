@@ -145,6 +145,7 @@ void Set::setHeader(const ColumnsWithTypeAndName & header)
 
     /// The constant columns to the right of IN are not supported directly. For this, they first materialize.
     Columns materialized_columns;
+    materialized_columns.reserve(keys_size);
 
     /// Remember the columns we will work with
     for (size_t i = 0; i < keys_size; ++i)
@@ -312,8 +313,9 @@ std::shared_ptr<const PlainRanges> Set::getPlainRanges() const
 
             const auto & column = *set_elements.front();
             Ranges ranges;
-            ranges.reserve(column.size());
-            for (size_t i = 0; i < column.size(); ++i)
+            const size_t num_elements = column.size();
+            ranges.reserve(num_elements);
+            for (size_t i = 0; i < num_elements; ++i)
                 ranges.emplace_back(column[i]);
 
             plain_ranges = std::make_shared<const PlainRanges>(ranges, /*may_have_intersection*/ true, /*ordered*/ false);

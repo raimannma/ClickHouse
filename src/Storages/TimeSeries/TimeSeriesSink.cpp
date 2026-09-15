@@ -99,16 +99,16 @@ namespace
         Field min_value;
         column.get(start, min_value);
         Field max_value = min_value;
+        Field value;
         for (size_t j = start + 1; j < end; ++j)
         {
-            Field value;
             column.get(j, value);
             if (value < min_value)
                 min_value = value;
             if (value > max_value)
                 max_value = value;
         }
-        return {min_value, max_value};
+        return {std::move(min_value), std::move(max_value)};
     }
 
     /// Fills columns min_time and max_time for the "tags" table.
@@ -190,7 +190,8 @@ namespace
         IColumn & out_unit_column,
         IColumn & out_help_column)
     {
-        for (size_t i = 0; i < metric_family_column.size(); ++i)
+        const size_t num_rows = metric_family_column.size();
+        for (size_t i = 0; i < num_rows; ++i)
         {
             if (metric_family_column.getDataAt(i).empty())
             {
@@ -321,7 +322,7 @@ void TimeSeriesSink::insertSortedTagsToColumns(
         out_tags_values.insertData(tag_value.data(), tag_value.size());
     }
 
-    out_tags_offsets.insert(out_tags_names.size());
+    assert_cast<ColumnArray::ColumnOffsets &>(out_tags_offsets).getData().push_back(out_tags_names.size());
 
     /// For named-tag columns that had no matching tag in this row, insert the default value.
     size_t expected_num_rows = out_tags_offsets.size();

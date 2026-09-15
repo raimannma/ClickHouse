@@ -168,7 +168,7 @@ void MergeTreeIndexAggregatorMinMax::update(const Block & block, size_t * pos, s
     size_t range_end = *pos + rows_read;
     for (size_t i = 0; i < index_sample_block.columns(); ++i)
     {
-        auto index_column_name = index_sample_block.getByPosition(i).name;
+        const auto & index_column_name = index_sample_block.getByPosition(i).name;
         const auto & src_column = block.getByName(index_column_name).column;
         /// Only LowCardinality needs unwrapping to expose a nested Nullable; gate the call so other
         /// columns are untouched. LC(Nullable(T)) then takes getExtremesNullLast (keeps the +inf NULL

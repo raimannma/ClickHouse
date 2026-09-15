@@ -1887,7 +1887,7 @@ void MergeTreeIndexAggregatorText::update(const Block & block, size_t * pos, siz
 }
 
 template <bool tokenize>
-void MergeTreeIndexAggregatorText::addDocumentsFromArray(ColumnPtr column, size_t start_row, size_t rows_read)
+void MergeTreeIndexAggregatorText::addDocumentsFromArray(const ColumnPtr & column, size_t start_row, size_t rows_read)
 {
     const ColumnArray * column_array = assert_cast<const ColumnArray *>(column.get());
     const IColumn & column_data = column_array->getData();
@@ -1917,7 +1917,7 @@ void MergeTreeIndexAggregatorText::addDocumentsFromArray(ColumnPtr column, size_
     }
 }
 
-void MergeTreeIndexAggregatorText::addDocumentsFromMap(ColumnPtr column, size_t start_row, size_t rows_read)
+void MergeTreeIndexAggregatorText::addDocumentsFromMap(const ColumnPtr & column, size_t start_row, size_t rows_read)
 {
     const auto & column_map = assert_cast<const ColumnMap &>(*column);
     const auto & column_offsets = column_map.getNestedColumn().getOffsets();

@@ -114,6 +114,7 @@ void PrettyBlockOutputFormat::calculateWidths(
 
         widths[i].resize_fill(num_displayed_rows);
 
+        const auto serialization = elem.type->getDefaultSerialization();
         size_t displayed_row = 0;
         for (size_t j = 0; j < num_rows; ++j)
         {
@@ -122,7 +123,6 @@ void PrettyBlockOutputFormat::calculateWidths(
 
             {
                 WriteBufferFromString out_serialize(serialized_value);
-                auto serialization = elem.type->getDefaultSerialization();
                 serialization->serializeText(*column, j, out_serialize, format_settings);
             }
 

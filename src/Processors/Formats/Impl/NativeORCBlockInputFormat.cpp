@@ -1578,20 +1578,21 @@ static ColumnPtr readByteMapFromORCColumn(const orc::ColumnVectorBatch * orc_col
 /// is nothing to read, so a null is returned and the caller uses a default-valued column instead.
 static ColumnPtr replaceNullPayloadRowsWithValidRow(const ColumnPtr & column, const NullMap & null_map)
 {
-    size_t valid_row = column->size();
-    for (size_t row = 0; row < column->size(); ++row)
+    const size_t num_rows = column->size();
+    size_t valid_row = num_rows;
+    for (size_t row = 0; row < num_rows; ++row)
         if (!null_map[row])
         {
             valid_row = row;
             break;
         }
 
-    if (valid_row == column->size())
+    if (valid_row == num_rows)
         return nullptr;
 
     auto result = column->cloneEmpty();
-    result->reserve(column->size());
-    for (size_t row = 0; row < column->size(); ++row)
+    result->reserve(num_rows);
+    for (size_t row = 0; row < num_rows; ++row)
         result->insertFrom(*column, null_map[row] ? valid_row : row);
     return result;
 }
@@ -3018,9 +3019,10 @@ void ORCColumnToCHColumn::orcColumnsToCHChunk(
                 if (!nested_tables.contains(resolved_nested_table_name))
                 {
                     NamesAndTypesList nested_columns;
+                    const String nested_prefix = nested_table_name + ".";
                     for (const auto & name_and_type : header.getNamesAndTypesList())
                     {
-                        if (name_and_type.name.starts_with(nested_table_name + "."))
+                        if (name_and_type.name.starts_with(nested_prefix))
                             nested_columns.push_back(name_and_type);
                     }
                     auto nested_table_type = Nested::collect(nested_columns).front().type;

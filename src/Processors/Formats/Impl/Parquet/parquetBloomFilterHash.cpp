@@ -214,7 +214,8 @@ std::optional<std::vector<uint64_t>> parquetTryHashColumn(const IColumn * data_c
     /// The dictionary-filter pruning path budgets this vector as exactly `size() * sizeof(UInt64)`
     /// against `input_format_parquet_memory_high_watermark` (see `hashDictionaryValues`); a geometric
     /// growth would transiently allocate up to twice that and overshoot the reservation.
-    hashes.reserve(column->size());
+    const size_t num_values = column->size();
+    hashes.reserve(num_values);
 
     /// Hash string columns directly from their underlying buffers. The generic `Field` path below
     /// copies every value into the `std::string` inside `Field` - a heap scratch allocation of up to
@@ -235,7 +236,7 @@ std::optional<std::vector<uint64_t>> parquetTryHashColumn(const IColumn * data_c
         }
 
         parquet::XxHasher hasher;
-        for (size_t i = 0u; i < column->size(); i++)
+        for (size_t i = 0u; i < num_values; i++)
         {
             std::string_view value = column->getDataAt(i);
             parquet::ByteArray ba{value};
@@ -264,7 +265,7 @@ std::optional<std::vector<uint64_t>> parquetTryHashColumn(const IColumn * data_c
         }
     }
 
-    for (size_t i = 0u; i < column->size(); i++)
+    for (size_t i = 0u; i < num_values; i++)
     {
         Field f;
         column->get(i, f);

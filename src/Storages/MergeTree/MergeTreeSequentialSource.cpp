@@ -275,13 +275,16 @@ try
             auto & offset_data = assert_cast<ColumnUInt64 &>(*mutable_column).getData();
             if (read_task_info->merged_part_offsets->isMappingEnabled())
             {
+                const auto & merged_offsets = *read_task_info->merged_part_offsets;
+                const size_t part_index = read_task_info->part_index_in_query;
                 for (auto & offset : offset_data)
-                    offset = (*read_task_info->merged_part_offsets)[read_task_info->part_index_in_query, offset];
+                    offset = merged_offsets[part_index, offset];
             }
             else
             {
+                const size_t starting_offset = read_task_info->part_starting_offset_in_query;
                 for (auto & offset : offset_data)
-                    offset += read_task_info->part_starting_offset_in_query;
+                    offset += starting_offset;
             }
             result_column = std::move(mutable_column);
         }

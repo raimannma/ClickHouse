@@ -70,6 +70,7 @@ public:
     ColumnPtr executeImpl(const ColumnsWithTypeAndName & arguments, const DataTypePtr &, size_t input_rows_count) const override
     {
         auto result = ColumnString::create();
+        result->reserve(input_rows_count);
 
         const auto * col = arguments[0].column.get();
 

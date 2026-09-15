@@ -86,7 +86,7 @@ struct ColumnToPointsConverter
 
         VectorWithMemoryTracking<Point> answer(col->size());
 
-        for (size_t i = 0; i < col->size(); ++i)
+        for (size_t i = 0, rows = answer.size(); i < rows; ++i)
         {
             const Float64 first = first_container[i];
             const Float64 second = second_container[i];

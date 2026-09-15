@@ -69,7 +69,7 @@ public:
 
     std::vector<String> readRowForHeaderDetection() override { return readHeaderRow(); }
 
-    void checkNullValueForNonNullable(DataTypePtr type) override;
+    void checkNullValueForNonNullable(const DataTypePtr & type) override;
 
     bool parseFieldDelimiterWithDiagnosticInfo(WriteBuffer & out) override;
     bool parseRowEndWithDiagnosticInfo(WriteBuffer & out) override;

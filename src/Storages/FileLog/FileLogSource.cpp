@@ -1,4 +1,6 @@
 #include <Columns/IColumn.h>
+#include <Columns/ColumnsNumber.h>
+#include <Common/assert_cast.h>
 #include <Formats/FormatFactory.h>
 #include <Formats/FormatParserSharedResources.h>
 #include <Interpreters/Context.h>
@@ -131,11 +133,12 @@ Chunk FileLogSource::generate()
         {
             auto file_name = consumer->getFileName();
             auto offset = consumer->getOffset();
+            const auto table_name = storage.getStorageID().getTableName();
             for (size_t i = 0; i < new_rows; ++i)
             {
-                virtual_columns[0]->insert(file_name);
-                virtual_columns[1]->insert(offset);
-                virtual_columns[2]->insert(storage.getStorageID().getTableName());
+                virtual_columns[0]->insertData(file_name.data(), file_name.size());
+                assert_cast<ColumnUInt64 &>(*virtual_columns[1]).insertValue(offset);
+                virtual_columns[2]->insertData(table_name.data(), table_name.size());
                 if (handle_error_mode == StreamingHandleErrorMode::STREAM)
                 {
                     if (exception_message)

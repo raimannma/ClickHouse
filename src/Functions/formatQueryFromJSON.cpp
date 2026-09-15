@@ -290,6 +290,7 @@ public:
     ColumnPtr executeImpl(const ColumnsWithTypeAndName & arguments, const DataTypePtr &, size_t input_rows_count) const override
     {
         auto result = ColumnString::create();
+        result->reserve(input_rows_count);
 
         const auto * json_col = arguments[0].column.get();
         const auto * orig_col = arguments.size() > 1 ? arguments[1].column.get() : nullptr;

@@ -196,13 +196,14 @@ ColumnPtr indexColumn(const ColumnPtr & column, const DataTypePtr & type, const 
 {
     auto new_col = column->cloneEmpty();
     new_col->reserve(indices.size());
+    const size_t column_size = column->size();
     for (size_t idx : indices)
     {
         /// Rows where a default should be inserted have index == size. Fill them through the
         /// data type: types whose default is not all-zero (e.g. Enum, whose default is the
         /// first member) must not get a raw zero. Every non-joined-row fill in this file goes
         /// through the data type for the same reason.
-        if (idx < column->size())
+        if (idx < column_size)
             new_col->insertFrom(*column, idx);
         else
             type->insertDefaultInto(*new_col);
@@ -910,16 +911,18 @@ MergeJoinAlgorithm::Status MergeJoinAlgorithm::allJoin()
             const auto & col = left_src[col_idx];
             auto new_col = col->cloneEmpty();
             new_col->reserve(indices.size());
+            const size_t col_size = col->size();
+            const auto remap_it = left_to_right_key_remap.find(col_idx);
             for (size_t i = 0; i < indices.size(); ++i)
             {
-                if (indices[i] < col->size())
+                if (indices[i] < col_size)
                 {
                     new_col->insertFrom(*col, indices[i]);
                 }
                 else
                 {
-                    if (auto it = left_to_right_key_remap.find(col_idx); it != left_to_right_key_remap.end())
-                        new_col->insertFrom(*rcols[it->second], i);
+                    if (remap_it != left_to_right_key_remap.end())
+                        new_col->insertFrom(*rcols[remap_it->second], i);
                     else
                         left_types[col_idx]->insertDefaultInto(*new_col);
                 }

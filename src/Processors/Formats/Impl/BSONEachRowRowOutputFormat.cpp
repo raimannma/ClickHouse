@@ -262,9 +262,10 @@ size_t BSONEachRowRowOutputFormat::countBSONFieldSize(const IColumn & column, co
 
             WriteBufferFromOwnString buf;
             String current_path = path + "." + name;
+            const auto key_serialization = key_type->getDefaultSerialization();
             for (size_t i = 0; i < map_size; ++i)
             {
-                key_type->getDefaultSerialization()->serializeText(*key_column, offset + i, buf, settings);
+                key_serialization->serializeText(*key_column, offset + i, buf, settings);
                 auto s = countBSONFieldSize(*value_column, value_type, offset + i, toValidUTF8String(buf.str(), settings), current_path, nested_document_sizes);
                 document_size += s;
                 buf.restart();
@@ -500,9 +501,10 @@ void BSONEachRowRowOutputFormat::serializeField(const IColumn & column, const Da
             writeBSONSize(document_size, out);
 
             WriteBufferFromOwnString buf;
+            const auto key_serialization = key_type->getDefaultSerialization();
             for (size_t i = 0; i < map_size; ++i)
             {
-                key_type->getDefaultSerialization()->serializeText(*key_column, offset + i, buf, settings);
+                key_serialization->serializeText(*key_column, offset + i, buf, settings);
                 serializeField(*value_column, value_type, offset + i, toValidUTF8String(buf.str(), settings), current_path, nested_document_sizes);
                 buf.restart();
             }

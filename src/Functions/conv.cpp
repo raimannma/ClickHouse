@@ -77,13 +77,15 @@ public:
         const auto & from_base_column = arguments[1].column;
         const auto & to_base_column = arguments[2].column;
         auto result_column = ColumnString::create();
+        result_column->reserve(input_rows_count);
+        const String const_number_str = number_const_col ? number_const_col->getValue<String>() : String{};
+        std::string number_str;
         for (size_t i = 0; i < input_rows_count; ++i)
         {
-            std::string number_str;
             if (number_col)
-                number_str = std::string{number_col->getDataAt(i)};
+                number_str.assign(number_col->getDataAt(i));
             else
-                number_str = number_const_col->getValue<String>();
+                number_str = const_number_str;
             const Int64 from_base = from_base_column->getInt(i);
             const Int64 to_base = to_base_column->getInt(i);
             std::string result = convertNumber(number_str, static_cast<int>(from_base), static_cast<int>(to_base));

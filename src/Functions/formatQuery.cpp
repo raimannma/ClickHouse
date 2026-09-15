@@ -109,6 +109,7 @@ private:
         size_t prev_offset = 0;
         size_t res_data_size = 0;
 
+        WriteBufferFromOwnString buf;
         for (size_t i = 0; i < input_rows_count; ++i)
         {
             const char * begin = reinterpret_cast<const char *>(&data[prev_offset]);
@@ -116,7 +117,7 @@ private:
 
             ParserQuery parser(end, false, implicit_select);
             ASTPtr ast;
-            WriteBufferFromOwnString buf;
+            buf.restart();
 
             try
             {

@@ -1,4 +1,6 @@
 #include <Storages/RabbitMQ/RabbitMQSource.h>
+#include <Columns/ColumnsNumber.h>
+#include <Common/assert_cast.h>
 
 #include <IO/WriteHelpers.h>
 #include <Core/Settings.h>
@@ -321,6 +323,7 @@ Chunk RabbitMQSource::generateImpl()
         if (new_rows || is_dead_letter)
         {
             const auto exchange_name = storage.getExchange();
+            const auto table_name = storage.getStorageID().getTableName();
             const auto & message = consumer->currentMessage();
 
             LOG_TEST(
@@ -350,11 +353,11 @@ Chunk RabbitMQSource::generateImpl()
             {
                 virtual_columns[0]->insert(exchange_name);
                 virtual_columns[1]->insert(message.channel_id);
-                virtual_columns[2]->insert(message.delivery_tag);
-                virtual_columns[3]->insert(message.redelivered);
+                assert_cast<ColumnUInt64 &>(*virtual_columns[2]).insertValue(message.delivery_tag);
+                assert_cast<ColumnUInt8 &>(*virtual_columns[3]).insertValue(message.redelivered);
                 virtual_columns[4]->insert(message.message_id);
-                virtual_columns[5]->insert(message.timestamp);
-                virtual_columns[6]->insert(storage.getStorageID().getTableName());
+                assert_cast<ColumnUInt64 &>(*virtual_columns[5]).insertValue(message.timestamp);
+                virtual_columns[6]->insertData(table_name.data(), table_name.size());
                 if (handle_error_mode == StreamingHandleErrorMode::STREAM)
                 {
                     if (exception_message)

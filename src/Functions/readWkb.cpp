@@ -76,7 +76,7 @@ public:
                 throw Exception(ErrorCodes::BAD_ARGUMENTS,
                     "Function {}: expected geometry type {}, got variant index {}",
                     NameHolder::name, ReturnDataTypeName().getName(), object.index());
-            auto boost_object = std::get<Geometry>(object);
+            const auto & boost_object = std::get<Geometry>(object);
             serializer.add(boost_object);
         }
         return serializer.finalize();

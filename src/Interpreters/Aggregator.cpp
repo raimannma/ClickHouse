@@ -3443,6 +3443,7 @@ Aggregator::convertToBlockImpl(Method & method, Table & data, Arena * arena, Are
             shuffled_key_sizes = method.shuffleKeyColumns(out_cols->raw_key_columns, key_sizes);
         };
 
+        IColumn::SerializationSettings serialization_settings{.serialize_string_with_zero_byte = params.serialize_string_with_zero_byte};
         init_out_cols();
         auto fill_blocks = [&]<bool is_final>(const auto & key, auto & mapped)
         {
@@ -3450,8 +3451,6 @@ Aggregator::convertToBlockImpl(Method & method, Table & data, Arena * arena, Are
                 init_out_cols();
 
             const auto & key_sizes_ref = shuffled_key_sizes ? *shuffled_key_sizes : key_sizes;
-            IColumn::SerializationSettings serialization_settings{
-                .serialize_string_with_zero_byte = params.serialize_string_with_zero_byte};
             method.insertKeyIntoColumns(key, out_cols->raw_key_columns, key_sizes_ref, &serialization_settings);
 
             if constexpr (is_final)
@@ -3708,6 +3707,7 @@ Chunks Aggregator::convertToBlockImplKeysOnly(
     };
 
     // should be invoked at least once, because null data might be the only content of the `data`
+    IColumn::SerializationSettings serialization_settings{.serialize_string_with_zero_byte = params.serialize_string_with_zero_byte};
     init_out_cols();
 
     data.forEachValue(
@@ -3717,8 +3717,6 @@ Chunks Aggregator::convertToBlockImplKeysOnly(
                 init_out_cols();
 
             const auto & key_sizes_ref = shuffled_key_sizes ? *shuffled_key_sizes : key_sizes;
-            IColumn::SerializationSettings serialization_settings{
-                .serialize_string_with_zero_byte = params.serialize_string_with_zero_byte};
             method.insertKeyIntoColumns(key, out_cols->raw_key_columns, key_sizes_ref, &serialization_settings);
 
             ++rows_in_current_block;
@@ -3785,6 +3783,7 @@ Chunks Aggregator::convertToBlockImplFinal(
     };
 
     // should be invoked at least once, because null data might be the only content of the `data`
+    IColumn::SerializationSettings serialization_settings{.serialize_string_with_zero_byte = params.serialize_string_with_zero_byte};
     init_out_cols();
 
     data.forEachValue(
@@ -3794,8 +3793,6 @@ Chunks Aggregator::convertToBlockImplFinal(
                 init_out_cols();
 
             const auto & key_sizes_ref = shuffled_key_sizes ? *shuffled_key_sizes : key_sizes;
-            IColumn::SerializationSettings serialization_settings{
-                .serialize_string_with_zero_byte = params.serialize_string_with_zero_byte};
             method.insertKeyIntoColumns(key, out_cols->raw_key_columns, key_sizes_ref, &serialization_settings);
             places.emplace_back(mapped);
 
@@ -3863,6 +3860,7 @@ Aggregator::convertToBlockImplNotFinal(Method & method, Table & data, Arenas & a
     };
 
     // should be invoked at least once, because null data might be the only content of the `data`
+    IColumn::SerializationSettings serialization_settings{.serialize_string_with_zero_byte = params.serialize_string_with_zero_byte};
     init_out_cols();
     data.forEachValue(
         [&](const auto & key, auto & mapped)
@@ -3871,8 +3869,6 @@ Aggregator::convertToBlockImplNotFinal(Method & method, Table & data, Arenas & a
                 init_out_cols();
 
             const auto & key_sizes_ref = shuffled_key_sizes ? *shuffled_key_sizes : key_sizes;
-            IColumn::SerializationSettings serialization_settings{
-                .serialize_string_with_zero_byte = params.serialize_string_with_zero_byte};
             method.insertKeyIntoColumns(key, out_cols->raw_key_columns, key_sizes_ref, &serialization_settings);
 
             /// reserved, so push_back does not throw exceptions

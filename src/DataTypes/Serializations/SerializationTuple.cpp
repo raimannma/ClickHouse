@@ -383,7 +383,7 @@ void SerializationTuple::serializeTextJSONPretty(const IColumn & column, size_t 
             writeChar(settings.json.pretty_print_indent, (indent + 1) * settings.json.pretty_print_indent_multiplier, ostr);
             writeJSONString(elems[i]->getElementName(), ostr, settings);
             writeCString(": ", ostr);
-            elems[i]->serializeTextJSONPretty(extractElementColumn(column, i), row_num, ostr, settings, indent + 1);
+            elems[i]->serializeTextJSONPretty(element_column, row_num, ostr, settings, indent + 1);
             first = false;
         }
 

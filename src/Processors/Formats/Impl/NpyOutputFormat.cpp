@@ -31,7 +31,7 @@ template <typename ColumnType, typename ValueType>
 void writeNumpyNumbers(const ColumnPtr & column, WriteBuffer & buf)
 {
     const auto * number_column = assert_cast<const ColumnType *>(column.get());
-    for (size_t i = 0; i < number_column->size(); ++i)
+    for (size_t i = 0, rows = number_column->size(); i < rows; ++i)
         writeBinaryLittleEndian(ValueType(number_column->getElement(i)), buf);
 }
 
@@ -39,7 +39,7 @@ template <typename ColumnType>
 void writeNumpyStrings(const ColumnPtr & column, size_t length, WriteBuffer & buf)
 {
     const auto * string_column = assert_cast<const ColumnType *>(column.get());
-    for (size_t i = 0; i < string_column->size(); ++i)
+    for (size_t i = 0, rows = string_column->size(); i < rows; ++i)
     {
         auto data = string_column->getDataAt(i);
         buf.write(data.data(), data.size());

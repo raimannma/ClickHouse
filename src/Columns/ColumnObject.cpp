@@ -387,8 +387,7 @@ void ColumnObject::getValueNameImpl(WriteBufferFromOwnString & name_buf, size_t 
             else
                 name_buf << ", ";
 
-            String path{shared_paths->getDataAt(i)};
-            writeDoubleQuoted(path, name_buf);
+            writeDoubleQuoted(shared_paths->getDataAt(i), name_buf);
 
             auto value_data = shared_values->getDataAt(i);
             ReadBufferFromMemory buf(value_data);

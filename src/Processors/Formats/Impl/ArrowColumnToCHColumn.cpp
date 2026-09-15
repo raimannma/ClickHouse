@@ -2877,9 +2877,10 @@ Chunk ArrowColumnToCHColumn::arrowColumnsToCHChunk(
                 if (!nested_tables.contains(search_nested_table_name))
                 {
                     NamesAndTypesList nested_columns;
+                    const String nested_prefix = nested_table_name + ".";
                     for (const auto & name_and_type : header.getNamesAndTypesList())
                     {
-                        if (name_and_type.name.starts_with(nested_table_name + "."))
+                        if (name_and_type.name.starts_with(nested_prefix))
                             nested_columns.push_back(name_and_type);
                     }
                     auto nested_table_type = Nested::collect(nested_columns).front().type;

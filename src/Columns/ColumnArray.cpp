@@ -1632,6 +1632,8 @@ ColumnPtr ColumnArray::replicateGeneric(const Offsets & replicate_offsets) const
     if (0 == col_size)
         return res;
 
+    res_concrete.reserve(replicate_offsets.back());
+
     IColumn::Offset prev_offset = 0;
     for (size_t i = 0; i < col_size; ++i)
     {

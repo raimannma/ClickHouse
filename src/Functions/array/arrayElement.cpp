@@ -2222,11 +2222,10 @@ ColumnPtr FunctionArrayElement<mode>::applyOuterNullMap(
     auto result_column = element_type->createColumn();
     result_column->reserve(element_column->size());
 
-    Field default_field = element_type->getDefault();
-    for (size_t i = 0; i < element_column->size(); ++i)
+    for (size_t i = 0, rows = element_column->size(); i < rows; ++i)
     {
         if (null_map[i])
-            result_column->insert(default_field);
+            element_type->insertDefaultInto(*result_column);
         else
             result_column->insertFrom(*element_column, i);
     }

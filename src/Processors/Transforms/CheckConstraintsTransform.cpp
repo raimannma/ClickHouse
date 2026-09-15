@@ -48,7 +48,7 @@ void CheckConstraintsTransform::onConsume(Chunk chunk)
         Block block_to_calculate = getInputPort().getHeader().cloneWithColumns(chunk.getColumns());
         for (size_t i = 0; i < expressions.size(); ++i)
         {
-            auto constraint_expr = expressions[i];
+            const auto & constraint_expr = expressions[i];
             constraint_expr->execute(block_to_calculate);
 
             auto * constraint_ptr = constraints_to_check[i]->as<ASTConstraintDeclaration>();

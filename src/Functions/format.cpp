@@ -107,7 +107,7 @@ public:
                 ColumnStringHelpers::WriteHelper<ColumnString> write_helper(*converted_col_str, column->size());
                 auto & write_buffer = write_helper.getWriteBuffer();
                 FormatSettings format_settings;
-                for (size_t row = 0; row < column->size(); ++row)
+                for (size_t row = 0, rows = column->size(); row < rows; ++row)
                 {
                     serialization->serializeText(*full_column, row, write_buffer, format_settings);
                     write_helper.finishRow();

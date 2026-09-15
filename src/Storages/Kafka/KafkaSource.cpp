@@ -234,6 +234,8 @@ Chunk KafkaSource::generateImpl()
                 }
             }
 
+            const auto table_name = storage.getStorageID().getTableName();
+
             for (size_t i = 0; i < new_rows; ++i)
             {
                 virtual_columns[0]->insert(topic);
@@ -254,7 +256,7 @@ Chunk KafkaSource::generateImpl()
                 }
                 virtual_columns[6]->insert(headers_names);
                 virtual_columns[7]->insert(headers_values);
-                virtual_columns[8]->insert(storage.getStorageID().getTableName());
+                virtual_columns[8]->insertData(table_name.data(), table_name.size());
                 if (handle_error_mode == StreamingHandleErrorMode::STREAM)
                 {
                     if (exception_message)

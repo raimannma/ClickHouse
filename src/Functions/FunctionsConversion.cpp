@@ -2218,7 +2218,7 @@ FunctionCast::WrapperType FunctionCast::createColumnToVariantWrapper(const DataT
             auto & discriminators_data = discriminators->getData();
             discriminators_data.reserve(column->size());
             size_t variant_size_hint = 0;
-            for (size_t i = 0; i != column->size(); ++i)
+            for (size_t i = 0, rows = column->size(); i != rows; ++i)
             {
                 if (null_map[i])
                 {

@@ -263,7 +263,8 @@ void SQLiteSource::insertValue(IColumn & column, ExternalResultDescription::Valu
             const char * data = reinterpret_cast<const char *>(sqlite3_column_text(compiled_statement.get(), idx));
             int len = sqlite3_column_bytes(compiled_statement.get(), idx);
             ReadBufferFromString buffer(std::string_view(data, len));
-            data_type.getDefaultSerialization()->deserializeWholeText(column, buffer, FormatSettings{});
+            static const FormatSettings default_format_settings;
+            data_type.getDefaultSerialization()->deserializeWholeText(column, buffer, default_format_settings);
             break;
         }
         case ValueType::vtFixedString:
@@ -278,7 +279,8 @@ void SQLiteSource::insertValue(IColumn & column, ExternalResultDescription::Valu
             const char * data = reinterpret_cast<const char *>(sqlite3_column_text(compiled_statement.get(), idx));
             int len = sqlite3_column_bytes(compiled_statement.get(), idx);
             ReadBufferFromString buffer(std::string_view(data, len));
-            data_type.getDefaultSerialization()->deserializeWholeText(column, buffer, FormatSettings{});
+            static const FormatSettings default_format_settings;
+            data_type.getDefaultSerialization()->deserializeWholeText(column, buffer, default_format_settings);
             break;
         }
     }

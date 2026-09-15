@@ -502,7 +502,7 @@ private:
             const auto & vec_arr = assert_cast<const ColumnArray &>(*vec_col.column);
             const auto & vec_vals = assert_cast<const ColumnFloat32 &>(vec_arr.getData()).getData();
             const auto & vec_off = vec_arr.getOffsets();
-            for (size_t row = 0; row < cid_col->size(); ++row)
+            for (size_t row = 0, rows = cid_col->size(); row < rows; ++row)
             {
                 size_t start = row ? vec_off[row - 1] : 0;
                 size_t length = vec_off[row] - start;

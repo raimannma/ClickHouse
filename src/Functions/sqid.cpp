@@ -74,9 +74,7 @@ public:
         {
             for (size_t j = 0; j < num_args; ++j)
             {
-                const ColumnWithTypeAndName & arg = arguments[j];
-                ColumnPtr current_column = arg.column;
-                numbers[j] = current_column->getUInt(i);
+                numbers[j] = arguments[j].column->getUInt(i);
             }
             auto id = sqids.encode(numbers);
             col_res->insertData(id.data(), id.size());

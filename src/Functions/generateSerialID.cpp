@@ -189,9 +189,11 @@ public:
             };
             UnorderedMapWithMemoryTracking<std::string_view, Series, StringViewHash> series;
 
+            const IColumn & name_column = *arguments[0].column;
+
             /// Count the number of rows for each name:
             for (size_t i = 0; i < input_rows_count; ++i)
-                ++series[arguments[0].column->getDataAt(i)].num_rows;
+                ++series[name_column.getDataAt(i)].num_rows;
 
             /// Update counters in Keeper:
             for (auto & [series_name, values] : series)
@@ -199,7 +201,7 @@ public:
 
             /// Populate the result:
             for (size_t i = 0; i < input_rows_count; ++i)
-                vec_to[i] = ++series[arguments[0].column->getDataAt(i)].old_value;
+                vec_to[i] = ++series[name_column.getDataAt(i)].old_value;
         }
 
         return col_res;

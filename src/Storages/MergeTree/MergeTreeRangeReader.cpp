@@ -607,7 +607,7 @@ void MergeTreeRangeReader::ReadResult::setFilterConstTrue()
     final_filter = FilterWithCachedCount();
 }
 
-static ColumnPtr andFilters(ColumnPtr c1, ColumnPtr c2)
+static ColumnPtr andFilters(const ColumnPtr & c1, const ColumnPtr & c2)
 {
     if (c1->size() != c2->size())
         throw Exception(ErrorCodes::LOGICAL_ERROR, "Size of filters don't match: {} and {}",
@@ -1390,7 +1390,8 @@ void MergeTreeRangeReader::fillDistanceColumnAndFilterForVectorSearch(Columns & 
 
     const auto & offsets  = typeid_cast<const ColumnUInt64&>(*part_offsets_auto_column).getData();
     size_t j = 0;
-    for (size_t i = 0; i < part_offsets_auto_column->size(); ++i)
+    const size_t num_offsets = offsets.size();
+    for (size_t i = 0; i < num_offsets; ++i)
     {
         while (j < row_offsets_from_index.size() && offsets[i] > row_offsets_from_index[j])
             j++;

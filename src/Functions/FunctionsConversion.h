@@ -2536,6 +2536,7 @@ struct ConvertImpl
 
                 if (null_map)
                 {
+                    static const DateLUTImpl & utc_time_zone = DateLUT::instance("UTC");
                     for (size_t i = 0; i < size; ++i)
                     {
                         if (!null_map->getData()[i] && !time_zone_column && arguments.size() > 1)
@@ -2545,7 +2546,7 @@ struct ConvertImpl
                             else
                                 throw Exception(ErrorCodes::ILLEGAL_TYPE_OF_ARGUMENT, "Provided time zone must be non-empty");
                         }
-                        const DateLUTImpl * effective_tz = time_zone ? time_zone : &DateLUT::instance("UTC");
+                        const DateLUTImpl * effective_tz = time_zone ? time_zone : &utc_time_zone;
                         bool is_ok = true;
                         if constexpr (std::is_same_v<FromDataType, DataTypeDateTime64>)
                         {

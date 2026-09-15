@@ -276,7 +276,8 @@ void updateTTLInfo(MergeTreeDataPartTTLInfo & ttl_info, const IColumn & ttl_colu
 template <typename ColumnType>
 bool hasRowsInFilter(const ColumnType & where_column)
 {
-    for (size_t i = 0; i < where_column.size(); ++i)
+    const size_t num_rows = where_column.size();
+    for (size_t i = 0; i < num_rows; ++i)
     {
         if (where_column.getBool(i))
             return true;

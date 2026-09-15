@@ -387,7 +387,7 @@ ColumnPtr wrapInNullable(const ColumnPtr & src, ColumnPtr null_map)
             /// Reuse null_map as result_null_map if possible, thus avoiding unnecessary memory allocation.
             auto result_null_map_column = IColumn::mutate(std::move(null_map));
             auto & result_null_map = assert_cast<ColumnUInt8 &>(*result_null_map_column).getData();
-            for (size_t i = 0; i < result_null_map.size(); ++i)
+            for (size_t i = 0, size = result_null_map.size(); i < size; ++i)
                 result_null_map[i] |= src_null_map[i];
             null_map = std::move(result_null_map_column);
         }

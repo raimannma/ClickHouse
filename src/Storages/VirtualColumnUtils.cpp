@@ -314,7 +314,7 @@ static void addPathAndFileToVirtualColumns(
     const String * file_name = nullptr)
 {
     if (block.has("_path"))
-        columns[block.getPositionByName("_path")]->insert(path);
+        columns[block.getPositionByName("_path")]->insertData(path.data(), path.size());
 
     if (block.has("_file"))
     {
@@ -349,7 +349,7 @@ static void addPathAndFileToVirtualColumns(
         }
     }
 
-    columns[block.getPositionByName("_idx")]->insert(idx);
+    assert_cast<ColumnUInt64 &>(*columns[block.getPositionByName("_idx")]).insertValue(idx);
 }
 
 std::optional<ActionsDAG> createPathAndFileFilterDAG(

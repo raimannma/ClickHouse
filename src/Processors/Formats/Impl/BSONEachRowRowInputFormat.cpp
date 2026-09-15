@@ -489,6 +489,7 @@ void BSONEachRowRowInputFormat::readMap(IColumn & column, const DataTypePtr & da
     if (document_size < sizeof(BSONSizeT) + sizeof(BSON_DOCUMENT_END))
         throw Exception(ErrorCodes::INCORRECT_DATA, "Invalid document size: {}", document_size);
 
+    const auto key_serialization = key_data_type->getDefaultSerialization();
     auto read_map = [&]()
     {
         while (in->count() - document_start + sizeof(BSON_DOCUMENT_END) != document_size)
@@ -496,7 +497,7 @@ void BSONEachRowRowInputFormat::readMap(IColumn & column, const DataTypePtr & da
             auto nested_bson_type = getBSONType(readBSONType(*in));
             auto name = readBSONKeyName(*in, current_key_name);
             ReadBufferFromMemory buf(name);
-            key_data_type->getDefaultSerialization()->deserializeWholeText(key_column, buf, format_settings);
+            key_serialization->deserializeWholeText(key_column, buf, format_settings);
             readField(value_column, value_data_type, nested_bson_type);
         }
 

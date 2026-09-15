@@ -1040,6 +1040,7 @@ bool HashJoin::addBlockToJoin(const Block & block, ScatteredBlock::Selector sele
         for (size_t onexpr_idx = 0; onexpr_idx < onexprs.size(); ++onexpr_idx)
         {
             ColumnRawPtrs key_columns;
+            key_columns.reserve(onexprs[onexpr_idx].key_names_right.size());
             for (const auto & name : onexprs[onexpr_idx].key_names_right)
                 key_columns.push_back(all_key_columns[name].get());
 

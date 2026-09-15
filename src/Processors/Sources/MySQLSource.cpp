@@ -441,7 +441,8 @@ namespace
             case ValueType::vtDecimal256:
             {
                 ReadBuffer buffer(const_cast<char *>(value.data()), value.size(), 0);
-                data_type.getDefaultSerialization()->deserializeWholeText(column, buffer, FormatSettings{});
+                static const FormatSettings default_format_settings;
+                data_type.getDefaultSerialization()->deserializeWholeText(column, buffer, default_format_settings);
                 read_bytes_size += column.sizeOfValueIfFixed();
                 break;
             }

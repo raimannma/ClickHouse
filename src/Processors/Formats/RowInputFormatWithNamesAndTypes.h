@@ -91,7 +91,7 @@ public:
     virtual bool readField(IColumn & column, const DataTypePtr & type, const SerializationPtr & serialization, bool is_last_file_column, const String & column_name) = 0;
 
     /// Methods for parsing with diagnostic info.
-    virtual void checkNullValueForNonNullable(DataTypePtr) {}
+    virtual void checkNullValueForNonNullable(const DataTypePtr &) {}
     virtual bool parseRowStartWithDiagnosticInfo(WriteBuffer &) { return true; }
     virtual bool parseFieldDelimiterWithDiagnosticInfo(WriteBuffer &) { return true; }
     virtual bool parseRowEndWithDiagnosticInfo(WriteBuffer &) { return true;}

@@ -957,7 +957,7 @@ static void prepareGeoColumn(ColumnPtr & column, DataTypePtr & type)
         auto null_map = ColumnUInt8::create();
         result->reserve(col_variant.size());
         null_map->reserve(col_variant.size());
-        for (size_t i = 0; i < col_variant.size(); ++i)
+        for (size_t i = 0, rows = col_variant.size(); i < rows; ++i)
         {
             const auto local_discriminator = col_variant.localDiscriminatorAt(i);
             if (local_discriminator == ColumnVariant::NULL_DISCRIMINATOR)
@@ -985,25 +985,27 @@ static void prepareGeoColumn(ColumnPtr & column, DataTypePtr & type)
     }
 
     std::shared_ptr<IWKBTransform> transform;
-    if (type->getCustomName()->getName() == WKBPointTransform::name)
+    const String custom_name = type->getCustomName()->getName();
+    if (custom_name == WKBPointTransform::name)
         transform = std::make_shared<WKBPointTransform>();
-    if (type->getCustomName()->getName() == WKBMultiPointTransform::name)
+    else if (custom_name == WKBMultiPointTransform::name)
         transform = std::make_shared<WKBMultiPointTransform>();
-    if (type->getCustomName()->getName() == WKBLineStringTransform::name)
+    else if (custom_name == WKBLineStringTransform::name)
         transform = std::make_shared<WKBLineStringTransform>();
-    if (type->getCustomName()->getName() == WKBPolygonTransform::name)
+    else if (custom_name == WKBPolygonTransform::name)
         transform = std::make_shared<WKBPolygonTransform>();
-    if (type->getCustomName()->getName() == WKBMultiLineStringTransform::name)
+    else if (custom_name == WKBMultiLineStringTransform::name)
         transform = std::make_shared<WKBMultiLineStringTransform>();
-    if (type->getCustomName()->getName() == WKBMultiPolygonTransform::name)
+    else if (custom_name == WKBMultiPolygonTransform::name)
         transform = std::make_shared<WKBMultiPolygonTransform>();
 
     if (!transform)
         return;
 
     auto transformed_column = ColumnString::create();
-    transformed_column->reserve(column->size());
-    for (size_t i = 0; i < column->size(); ++i)
+    const size_t num_rows = column->size();
+    transformed_column->reserve(num_rows);
+    for (size_t i = 0; i < num_rows; ++i)
     {
         Field current_field;
         column->get(i, current_field);

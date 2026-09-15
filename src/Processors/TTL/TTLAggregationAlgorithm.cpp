@@ -180,7 +180,8 @@ void TTLAggregationAlgorithm::execute(Block & block)
             target_positions.push_back(header.getPositionByName(name));
         }
 
-        for (size_t i = 0; i < block.rows(); ++i)
+        const size_t num_rows = block.rows();
+        for (size_t i = 0; i < num_rows; ++i)
         {
             Int64 cur_ttl = timestamps[i];
             bool where_filter_passed = !where_column || where_column->getBool(i);
@@ -250,7 +251,8 @@ void TTLAggregationAlgorithm::execute(Block & block)
         auto where_column_after_aggregation = executeExpressionAndGetColumn(ttl_expressions.where_expression, block, description.where_result_column);
         PaddedPODArray<Int64> timestamps;
         extractTimestamps(ttl_column_after_aggregation.get(), timestamps);
-        for (size_t i = 0; i < block.rows(); ++i)
+        const size_t num_rows = block.rows();
+        for (size_t i = 0; i < num_rows; ++i)
         {
             bool where_filter_passed = !where_column_after_aggregation || where_column_after_aggregation->getBool(i);
             if (where_filter_passed)

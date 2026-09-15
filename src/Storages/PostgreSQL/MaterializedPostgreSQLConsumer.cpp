@@ -499,15 +499,15 @@ size_t MaterializedPostgreSQLConsumer::readTupleData(
     {
         case PostgreSQLQuery::INSERT:
         {
-            columns[num_columns]->insert(static_cast<Int8>(1));
-            columns[num_columns + 1]->insert(lsn_value);
+            assert_cast<ColumnInt8 &>(*columns[num_columns]).insertValue(1);
+            assert_cast<ColumnUInt64 &>(*columns[num_columns + 1]).insertValue(lsn_value);
 
             break;
         }
         case PostgreSQLQuery::DELETE:
         {
-            columns[num_columns]->insert(static_cast<Int8>(-1));
-            columns[num_columns + 1]->insert(lsn_value);
+            assert_cast<ColumnInt8 &>(*columns[num_columns]).insertValue(-1);
+            assert_cast<ColumnUInt64 &>(*columns[num_columns + 1]).insertValue(lsn_value);
 
             break;
         }
@@ -515,11 +515,11 @@ size_t MaterializedPostgreSQLConsumer::readTupleData(
         {
             /// Process old value in case changed value is a primary key.
             if (old_value)
-                columns[num_columns]->insert(static_cast<Int8>(-1));
+                assert_cast<ColumnInt8 &>(*columns[num_columns]).insertValue(-1);
             else
-                columns[num_columns]->insert(static_cast<Int8>(1));
+                assert_cast<ColumnInt8 &>(*columns[num_columns]).insertValue(1);
 
-            columns[num_columns + 1]->insert(lsn_value);
+            assert_cast<ColumnUInt64 &>(*columns[num_columns + 1]).insertValue(lsn_value);
 
             break;
         }

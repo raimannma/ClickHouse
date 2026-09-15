@@ -87,7 +87,8 @@ public:
             if (max_ast_elements)
                 ast->checkSize(max_ast_elements);
 
-            result->insert(serializeASTToJSON(*ast));
+            const String json = serializeASTToJSON(*ast);
+            result->insertData(json.data(), json.size());
         }
 
         return result;

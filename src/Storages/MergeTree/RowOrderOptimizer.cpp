@@ -18,13 +18,11 @@ namespace
 {
 
 /// Do the left and right row contain equal values in the sorting key columns (usually the primary key columns)
-bool haveEqualSortingKeyValues(const Block & block, const SortDescription & sort_description, size_t left_row, size_t right_row)
+bool haveEqualSortingKeyValues(const ColumnRawPtrs & sort_columns, size_t left_row, size_t right_row)
 {
-    for (const auto & sort_column : sort_description)
+    for (const IColumn * column : sort_columns)
     {
-        const String & sort_col = sort_column.column_name;
-        const IColumn & column = *block.getByName(sort_col).column;
-        if (column.compareAt(left_row, right_row, column, 1) != 0)
+        if (column->compareAt(left_row, right_row, *column, 1) != 0)
             return false;
     }
     return true;
@@ -91,10 +89,15 @@ EqualRanges getEqualRanges(const Block & block, const SortDescription & sort_des
     }
     else
     {
+        ColumnRawPtrs sort_columns;
+        sort_columns.reserve(sort_description.size());
+        for (const auto & sort_column : sort_description)
+            sort_columns.push_back(block.getByName(sort_column.column_name).column.get());
+
         for (size_t i = 0; i < rows;)
         {
             size_t j = i;
-            while (j < rows && haveEqualSortingKeyValues(block, sort_description, permutation[i], permutation[j]))
+            while (j < rows && haveEqualSortingKeyValues(sort_columns, permutation[i], permutation[j]))
                 ++j;
             ranges.push_back({i, j});
             i = j;

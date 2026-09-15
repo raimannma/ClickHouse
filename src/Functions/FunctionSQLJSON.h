@@ -594,11 +594,11 @@ public:
         ColumnUInt8 & col_bool = assert_cast<ColumnUInt8 &>(dest);
         if (status == VisitorStatus::Ok)
         {
-            col_bool.insert(1);
+            col_bool.insertValue(1);
         }
         else
         {
-            col_bool.insert(0);
+            col_bool.insertValue(0);
         }
         return true;
     }

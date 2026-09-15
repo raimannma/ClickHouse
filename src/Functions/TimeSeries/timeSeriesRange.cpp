@@ -319,7 +319,7 @@ public:
                         res_timestamps->insert(timestamp);
                     }
 
-                    res_offsets->insert(res_timestamps->size());
+                    res_offsets->getData().push_back(res_timestamps->size());
                     continue;
                 }
             }
@@ -341,7 +341,7 @@ public:
                     res_values->insertFrom(*values, offset);
             }
 
-            res_offsets->insert(res_timestamps->size());
+            res_offsets->getData().push_back(res_timestamps->size());
         }
 
         if constexpr (with_values)

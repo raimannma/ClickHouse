@@ -276,8 +276,10 @@ private:
         for (size_t row = 0; row < column_from->size(); row++)
         {
             // Effective Levenshtein realization from Common/levenshteinDistance
-            Array from = (*column_from)[row].safeGet<Array>();
-            Array to = (*column_to)[row].safeGet<Array>();
+            const Field from_field = (*column_from)[row];
+            const Field to_field = (*column_to)[row];
+            const Array & from = from_field.safeGet<Array>();
+            const Array & to = to_field.safeGet<Array>();
             res_values[row] = static_cast<ElementType>(levenshteinDistance<Field>(from, to));
         }
     }
@@ -393,8 +395,10 @@ private:
         for (size_t row = 0; row < column_from->size(); row++)
         {
             // Effective Levenshtein realization from Common/levenshteinDistance
-            Array from = (*column_from)[row].safeGet<Array>();
-            Array to = (*column_to)[row].safeGet<Array>();
+            const Field from_field = (*column_from)[row];
+            const Field to_field = (*column_to)[row];
+            const Array & from = from_field.safeGet<Array>();
+            const Array & to = to_field.safeGet<Array>();
 
             std::span<const W> from_weights(column_from_weights->getData().begin() + prev_from_weights_offset, from_weights_offsets[row] - prev_from_weights_offset);
             prev_from_weights_offset = from_weights_offsets[row];
@@ -458,18 +462,18 @@ private:
             const ColumnArray * weights_column = columns[i+2];
             for (size_t row = 0; row < hs_column->size(); row++)
             {
-                Array hs = (*hs_column)[row].safeGet<Array>();
-                Array weights = (*weights_column)[row].safeGet<Array>();
-                if (hs.size() != weights.size())
+                const size_t hs_size = hs_column->getOffsets()[row] - hs_column->getOffsets()[row - 1];
+                const size_t weights_size = weights_column->getOffsets()[row] - weights_column->getOffsets()[row - 1];
+                if (hs_size != weights_size)
                     throw Exception(
                         ErrorCodes::SIZES_OF_ARRAYS_DONT_MATCH,
                         "Arguments {} ({}, size {}) and {} ({}, size {}) of function {} must be arrays of the same size",
                         toString(i + 1),
                         hs_column->getName(),
-                        hs.size(),
+                        hs_size,
                         toString(i + 3),
                         weights_column->getName(),
-                        weights.size(),
+                        weights_size,
                         getName());
             }
         }

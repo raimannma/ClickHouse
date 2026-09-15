@@ -57,7 +57,8 @@ public:
             for (size_t i = 0; i < size; ++i)
                 arguments[i].column->get(j, row[i]);
             MergeTreePartition partition(std::move(row));
-            result_column->insert(partition.getID(sample_block));
+            const String id = partition.getID(sample_block);
+            result_column->insertData(id.data(), id.size());
         }
         return result_column;
     }

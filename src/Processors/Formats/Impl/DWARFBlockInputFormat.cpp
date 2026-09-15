@@ -781,7 +781,7 @@ Chunk DWARFBlockInputFormat::parseEntries(UnitState & unit)
                 dict->insertDefault();
                 dict->insertData(unit.unit_name.data(), unit.unit_name.size());
                 auto index = ColumnVector<UInt8>::create();
-                index->insert(1);
+                index->insertValue(1);
                 auto indices = index->replicate({num_rows});
                 cols.push_back(ColumnLowCardinality::create(
                     ColumnUnique<ColumnString>::create(std::move(dict), /*is_nullable*/ false), indices, /*is_shared*/ false));
@@ -793,7 +793,7 @@ Chunk DWARFBlockInputFormat::parseEntries(UnitState & unit)
                 dict->insertDefault();
                 dict->insertValue(unit.dwarf_unit->getOffset());
                 auto index = ColumnVector<UInt8>::create();
-                index->insert(1);
+                index->insertValue(1);
                 auto indices = index->replicate({num_rows});
                 cols.push_back(ColumnLowCardinality::create(
                     ColumnUnique<ColumnVector<UInt64>>::create(std::move(dict), /*is_nullable*/ false), indices, /*is_shared*/ false));

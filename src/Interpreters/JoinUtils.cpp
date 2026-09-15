@@ -48,9 +48,10 @@ void insertFromNullableOrDefault(MutableColumnPtr & dst, const ColumnNullable * 
 {
     const auto & nested = nullable_col->getNestedColumn();
     const auto & nullmap = nullable_col->getNullMapColumn().getData();
+    const size_t num_rows = nullmap.size();
     if (auto * lc = typeid_cast<ColumnLowCardinality *>(dst.get()); lc && !nested.lowCardinality())
     {
-        for (size_t i = 0; i < nullable_col->size(); ++i)
+        for (size_t i = 0; i < num_rows; ++i)
         {
             if (nullmap[i])
                 lc->insertDefault();
@@ -60,7 +61,7 @@ void insertFromNullableOrDefault(MutableColumnPtr & dst, const ColumnNullable * 
     }
     else
     {
-        for (size_t i = 0; i < nullable_col->size(); ++i)
+        for (size_t i = 0; i < num_rows; ++i)
         {
             if (nullmap[i])
                 dst->insertDefault();

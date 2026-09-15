@@ -74,19 +74,16 @@ static void dumpProfileEvents(ProfileEventsSnapshot const & snapshot, DB::Mutabl
 
         std::string_view desc = getName(event);
         name_column->insertData(desc);
-        value_column->insert(value);
+        assert_cast<DB::ColumnInt64 &>(*value_column).insertValue(value);
         rows++;
     }
 
     // Fill the rest of the columns with data
     for (size_t row = 0; row < rows; ++row)
-    {
-        size_t i = 0;
-        columns[i++]->insertData(host_name.data(), host_name.size());
-        columns[i++]->insert(static_cast<UInt64>(snapshot.current_time));
-        columns[i++]->insert(UInt64{snapshot.thread_id});
-        columns[i++]->insert(Type::INCREMENT);
-    }
+        columns[0]->insertData(host_name.data(), host_name.size());
+    columns[1]->insertMany(static_cast<UInt64>(snapshot.current_time), rows);
+    columns[2]->insertMany(UInt64{snapshot.thread_id}, rows);
+    columns[3]->insertMany(Type::INCREMENT, rows);
 }
 
 static void dumpMemoryTracker(ProfileEventsSnapshot const & snapshot, DB::MutableColumns & columns, String const & host_name)

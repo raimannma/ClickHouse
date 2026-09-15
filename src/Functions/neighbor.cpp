@@ -159,13 +159,11 @@ public:
 
                 if (!src)
                 {
-                    for (Int64 i = 0; i < size; ++i)
-                        result_column->insertDefault();
+                    result_column->insertManyDefaults(size);
                 }
                 else if (is_const)
                 {
-                    for (Int64 i = 0; i < size; ++i)
-                        result_column->insertFrom(*src, 0);
+                    result_column->insertManyFrom(*src, 0, size);
                 }
                 else
                 {

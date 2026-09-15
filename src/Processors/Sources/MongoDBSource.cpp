@@ -135,7 +135,8 @@ void MongoDBSource::insertValue(IColumn & column, const size_t & idx, const Data
         }
         case TypeIndex::String:
         {
-            assert_cast<ColumnString &>(column).insert(BSONElementAsString(value.get_value(), json_format_settings));
+            const auto value_str = BSONElementAsString(value.get_value(), json_format_settings);
+            assert_cast<ColumnString &>(column).insertData(value_str.data(), value_str.size());
             break;
         }
         case TypeIndex::Array:

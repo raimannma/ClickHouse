@@ -79,11 +79,11 @@ bool tryDeserializeAllVariants(ColumnUInt8 * column, ReadBuffer & istr)
 {
     if (checkCharCaseInsensitive('1', istr))
     {
-        column->insert(true);
+        column->insertValue(1);
     }
     else if (checkCharCaseInsensitive('0', istr))
     {
-        column->insert(false);
+        column->insertValue(0);
     }
     /// 'True' and 'T'
     else if (checkCharCaseInsensitive('t', istr))
@@ -94,7 +94,7 @@ bool tryDeserializeAllVariants(ColumnUInt8 * column, ReadBuffer & istr)
             if (!checkStringCaseInsensitive("ue", istr))
                 return false;
         }
-        column->insert(true);
+        column->insertValue(1);
     }
     /// 'False' and 'F'
     else if (checkCharCaseInsensitive('f', istr))
@@ -105,7 +105,7 @@ bool tryDeserializeAllVariants(ColumnUInt8 * column, ReadBuffer & istr)
             if (!checkStringCaseInsensitive("lse", istr))
                 return false;
         }
-        column->insert(false);
+        column->insertValue(0);
     }
     /// 'Yes' and 'Y'
     else if (checkCharCaseInsensitive('y', istr))
@@ -116,23 +116,23 @@ bool tryDeserializeAllVariants(ColumnUInt8 * column, ReadBuffer & istr)
             if (!checkCharCaseInsensitive('s', istr))
                 return false;
         }
-        column->insert(true);
+        column->insertValue(1);
     }
     /// 'No' and 'N'
     else if (checkCharCaseInsensitive('n', istr))
     {
         /// Check if it's just short form `N` or full form `No`
         checkCharCaseInsensitive('o', istr);
-        column->insert(false);
+        column->insertValue(0);
     }
     /// 'On' and 'Off'
     else if (checkCharCaseInsensitive('o', istr))
     {
         if (checkCharCaseInsensitive('n', istr))
-            column->insert(true);
+            column->insertValue(1);
         else if (checkStringCaseInsensitive("ff", istr))
         {
-            column->insert(false);
+            column->insertValue(0);
         }
         else
             return false;
@@ -142,14 +142,14 @@ bool tryDeserializeAllVariants(ColumnUInt8 * column, ReadBuffer & istr)
     {
         /// Check if it's 'enable' or 'enabled'
         checkCharCaseInsensitive('d', istr);
-        column->insert(true);
+        column->insertValue(1);
     }
     /// 'Disable' and 'Disabled'
     else if (checkStringCaseInsensitive("disable", istr))
     {
         /// Check if it's 'disable' or 'disabled'
         checkCharCaseInsensitive('d', istr);
-        column->insert(false);
+        column->insertValue(0);
     }
     else
     {
@@ -176,7 +176,7 @@ ReturnType deserializeImpl(
     buf.setCheckpoint();
     if (checkString(settings.bool_true_representation, buf) && check_end_of_value(buf))
     {
-        col->insert(true);
+        col->insertValue(1);
         return ReturnType(true);
     }
 
@@ -193,7 +193,7 @@ ReturnType deserializeImpl(
                     "bool_true_representation or bool_false_representation contains some delimiters of input format");
             return ReturnType(false);
         }
-        col->insert(false);
+        col->insertValue(0);
         return ReturnType(true);
     }
 
@@ -309,7 +309,7 @@ void SerializationBool::deserializeTextJSON(IColumn &column, ReadBuffer &istr, c
         throw Exception(ErrorCodes::CANNOT_PARSE_BOOL,
             "Invalid boolean value, should be true/false, 1/0, but it starts with the '{}' character.", first_char);
 
-    col->insert(value);
+    col->insertValue(value);
 }
 
 bool SerializationBool::tryDeserializeTextJSON(DB::IColumn & column, DB::ReadBuffer & istr, const DB::FormatSettings & settings) const
@@ -335,7 +335,7 @@ bool SerializationBool::tryDeserializeTextJSON(DB::IColumn & column, DB::ReadBuf
         return false;
     }
 
-    col->insert(value);
+    col->insertValue(value);
     return true;
 }
 
@@ -408,24 +408,24 @@ ReturnType deserializeTextQuotedImpl(IColumn & column, ReadBuffer & istr, const 
                 assertStringCaseInsensitive("true", istr);
             else if (!checkStringCaseInsensitive("true", istr))
                 return ReturnType(false);
-            col->insert(true);
+            col->insertValue(1);
             break;
         case 'f':
             if constexpr (throw_exception)
                 assertStringCaseInsensitive("false", istr);
             else if (!checkStringCaseInsensitive("false", istr))
                 return ReturnType(false);
-            col->insert(false);
+            col->insertValue(0);
             break;
         case '1':
             /// Advance the position like every other branch, otherwise the container reader
             /// re-reads the same digit and fails with CANNOT_READ_ARRAY_FROM_TEXT.
             ++istr.position();
-            col->insert(true);
+            col->insertValue(1);
             break;
         case '0':
             ++istr.position();
-            col->insert(false);
+            col->insertValue(0);
             break;
         case '\'':
             ++istr.position();

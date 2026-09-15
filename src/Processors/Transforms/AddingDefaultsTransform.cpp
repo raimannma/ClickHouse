@@ -117,12 +117,13 @@ static MutableColumnPtr mixColumns(
 
     MutableColumnPtr column_mixed = col_read.column->cloneEmpty();
 
+    const auto * defaults_const = checkAndGetColumn<ColumnConst>(col_defaults.column.get());
     for (size_t i = 0; i < defaults_needed; ++i)
     {
         if (defaults_mask[i])
         {
-            if (isColumnConst(*col_defaults.column))
-                column_mixed->insert((*col_defaults.column)[i]);
+            if (defaults_const)
+                column_mixed->insertFrom(defaults_const->getDataColumn(), 0);
             else
                 column_mixed->insertFrom(*col_defaults.column, i);
         }

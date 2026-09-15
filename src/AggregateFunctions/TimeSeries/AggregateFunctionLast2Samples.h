@@ -365,8 +365,8 @@ public:
 
         for (size_t i = 0; i < data.filled; ++i)
         {
-            timestamps_to.insert(data.timestamps[i]);
-            values_to.insert(data.values[i]);
+            timestamps_to.insertValue(data.timestamps[i]);
+            values_to.insertValue(data.values[i]);
         }
     }
 

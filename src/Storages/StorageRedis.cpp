@@ -466,7 +466,7 @@ Chunk StorageRedis::getBySerializedKeys(const RedisArray & keys, PaddedPODArray<
         if (null_map && !(*null_map)[i])
         {
             for (size_t col_idx = 0; col_idx < sample_block.columns(); ++col_idx)
-                columns[col_idx]->insert(sample_block.getByPosition(col_idx).type->getDefault());
+                sample_block.getByPosition(col_idx).type->insertDefaultInto(*columns[col_idx]);
             continue;
         }
 
@@ -484,7 +484,7 @@ Chunk StorageRedis::getBySerializedKeys(const RedisArray & keys, PaddedPODArray<
                 (*null_map)[i] = 0;
                 for (size_t col_idx = 0; col_idx < sample_block.columns(); ++col_idx)
                 {
-                    columns[col_idx]->insert(sample_block.getByPosition(col_idx).type->getDefault());
+                    sample_block.getByPosition(col_idx).type->insertDefaultInto(*columns[col_idx]);
                 }
             }
         }

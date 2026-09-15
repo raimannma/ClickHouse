@@ -521,8 +521,8 @@ public:
 
         for (const Element & element : data.elements)
         {
-            timestamps_to.insert(element.timestamp);
-            values_to.insert(element.value);
+            timestamps_to.insertValue(element.timestamp);
+            values_to.insertValue(element.value);
         }
 
         offsets_to.push_back(offsets_to.back() + data.elements.size());

@@ -975,7 +975,8 @@ static void prepareGeoColumn(ColumnPtr & column, DataTypePtr & type)
             const auto & sub_column = col_variant.getVariantByLocalDiscriminator(local_discriminator);
             Field field;
             sub_column.get(col_variant.offsetAt(i), field);
-            result->insert(transforms[global_discriminator]->dumpObject(field));
+            const String serialized = transforms[global_discriminator]->dumpObject(field);
+            result->insertData(serialized.data(), serialized.size());
             null_map->insertValue(0);
         }
         column = ColumnNullable::create(std::move(result), std::move(null_map));
@@ -1001,12 +1002,13 @@ static void prepareGeoColumn(ColumnPtr & column, DataTypePtr & type)
         return;
 
     auto transformed_column = ColumnString::create();
+    transformed_column->reserve(column->size());
     for (size_t i = 0; i < column->size(); ++i)
     {
         Field current_field;
         column->get(i, current_field);
-        auto transformed_field = transform->dumpObject(current_field);
-        transformed_column->insert(transformed_field);
+        const String transformed = transform->dumpObject(current_field);
+        transformed_column->insertData(transformed.data(), transformed.size());
     }
     column = std::move(transformed_column);
     type = std::make_shared<DataTypeString>();

@@ -431,7 +431,7 @@ namespace
                 break;
             }
             case ValueType::vtUUID:
-                assert_cast<ColumnUUID &>(column).insert(parse<UUID>(value.data(), value.size()));
+                assert_cast<ColumnUUID &>(column).insertValue(parse<UUID>(value.data(), value.size()));
                 read_bytes_size += assert_cast<ColumnUUID &>(column).byteSize();
                 break;
             case ValueType::vtDateTime64:[[fallthrough]];
@@ -481,7 +481,9 @@ namespace
                     readBinaryBigEndian(y, payload);
                 }
 
-                assert_cast<ColumnTuple &>(column).insert(Tuple({Field(x), Field(y)}));
+                auto & tuple_column = assert_cast<ColumnTuple &>(column);
+                assert_cast<ColumnFloat64 &>(tuple_column.getColumn(0)).insertValue(x);
+                assert_cast<ColumnFloat64 &>(tuple_column.getColumn(1)).insertValue(y);
                 read_bytes_size += value.size();
                 break;
             }

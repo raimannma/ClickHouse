@@ -2837,7 +2837,7 @@ struct WindowFunctionLagLeadImpl final : public StatelessWindowFunction
                         *current_block.cast_columns[function_index].get() :
                         *current_block.input_columns[workspace.argument_column_indices[2]].get();
 
-                to.insert(default_column[transform->current_row.row]);
+                to.insertFrom(default_column, transform->current_row.row);
             }
             else
             {

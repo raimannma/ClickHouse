@@ -79,7 +79,7 @@ public:
                 numbers[j] = current_column->getUInt(i);
             }
             auto id = sqids.encode(numbers);
-            col_res->insert(id);
+            col_res->insertData(id.data(), id.size());
         }
         return col_res;
     }

@@ -319,7 +319,8 @@ public:
                     {
                         WriteBufferFromOwnString buf;
                         serialization->serializeTextJSON(*merged, i, buf, format_settings);
-                        raw_col->insert(buf.str());
+                        const auto & raw = buf.str();
+                        raw_col->insertData(raw.data(), raw.size());
                     }
                 }
                 return raw_col;

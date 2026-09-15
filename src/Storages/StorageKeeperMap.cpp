@@ -1602,7 +1602,7 @@ Chunk StorageKeeperMap::getBySerializedKeys(
     auto metadata_snapshot = getInMemoryMetadataPtr(local_context, false);
     Block sample_block = metadata_snapshot->getSampleBlock();
     MutableColumns columns = sample_block.cloneEmptyColumns();
-    MutableColumnPtr version_column = nullptr;
+    ColumnVector<Int32>::MutablePtr version_column;
 
     if (with_version)
         version_column = ColumnVector<Int32>::create();
@@ -1649,10 +1649,10 @@ Chunk StorageKeeperMap::getBySerializedKeys(
         if (null_map && !(*null_map)[i])
         {
             for (size_t col_idx = 0; col_idx < sample_block.columns(); ++col_idx)
-                columns[col_idx]->insert(sample_block.getByPosition(col_idx).type->getDefault());
+                sample_block.getByPosition(col_idx).type->insertDefaultInto(*columns[col_idx]);
 
             if (version_column)
-                version_column->insert(-1);
+                version_column->insertValue(-1);
             continue;
         }
 
@@ -1665,7 +1665,7 @@ Chunk StorageKeeperMap::getBySerializedKeys(
             fillColumns(base64Decode(keys[i], true), response.data, primary_key_pos, sample_block, columns);
 
             if (version_column)
-                version_column->insert(response.stat.version);
+                version_column->insertValue(response.stat.version);
         }
         else if (code == Coordination::Error::ZNONODE)
         {
@@ -1673,10 +1673,10 @@ Chunk StorageKeeperMap::getBySerializedKeys(
             {
                 (*null_map)[i] = 0;
                 for (size_t col_idx = 0; col_idx < sample_block.columns(); ++col_idx)
-                    columns[col_idx]->insert(sample_block.getByPosition(col_idx).type->getDefault());
+                    sample_block.getByPosition(col_idx).type->insertDefaultInto(*columns[col_idx]);
 
                 if (version_column)
-                    version_column->insert(-1);
+                    version_column->insertValue(-1);
             }
         }
         else

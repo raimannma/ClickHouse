@@ -324,14 +324,16 @@ public:
                 String canonical = buf.str();
 
                 auto original = String(orig_col->getDataAt(i));
-                result->insert(formatWithOriginalWhitespaceChecked(canonical, original));
+                const String formatted = formatWithOriginalWhitespaceChecked(canonical, original);
+                result->insertData(formatted.data(), formatted.size());
             }
             else
             {
                 /// One-argument form: canonical formatting.
                 IAST::FormatSettings format_settings(/*one_line=*/true);
                 ast->format(buf, format_settings);
-                result->insert(buf.str());
+                const auto & formatted = buf.str();
+                result->insertData(formatted.data(), formatted.size());
             }
         }
 

@@ -251,7 +251,7 @@ void SQLiteSource::insertValue(IColumn & column, ExternalResultDescription::Valu
         {
             const char * data = reinterpret_cast<const char *>(sqlite3_column_text(compiled_statement.get(), idx));
             int len = sqlite3_column_bytes(compiled_statement.get(), idx);
-            assert_cast<ColumnUUID &>(column).insert(parse<UUID>(data, len));
+            assert_cast<ColumnUUID &>(column).insertValue(parse<UUID>(data, len));
             break;
         }
         case ValueType::vtDateTime64:

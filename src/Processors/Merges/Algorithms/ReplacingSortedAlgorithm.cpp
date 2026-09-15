@@ -112,7 +112,7 @@ void ReplacingSortedAlgorithm::insertRowImpl()
         if (!selected_row.owned_chunk->replace_final_selection)
             selected_row.owned_chunk->replace_final_selection = ColumnUInt64::create();
 
-        selected_row.owned_chunk->replace_final_selection->insert(selected_row.row_num);
+        assert_cast<ColumnUInt64 &>(*selected_row.owned_chunk->replace_final_selection).insertValue(selected_row.row_num);
 
         /// This is the last row we can select from `selected_row.owned_chunk`, keep it to emit later
         if (selected_row.current_cursor == nullptr)

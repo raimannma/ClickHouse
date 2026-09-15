@@ -18,6 +18,7 @@
 #include <Common/StringUtils.h>
 #include <Common/escapeForFileName.h>
 #include <Common/logger_useful.h>
+#include <Columns/ColumnArray.h>
 #include <Columns/IColumn.h>
 #include <Compression/CompressionCodecAdaptive.h>
 #include <Compression/CompressionFactory.h>
@@ -769,17 +770,26 @@ void MergeTreeDataPartWriterOnDisk::setVectorDimensionsIfNeeded(CompressionCodec
 {
     if (codec->needsVectorDimensionUpfront())
     {
-        Field sample_field;
-        column->get(0, sample_field);
         /// Only arrays carry a vector dimension here. A `Tuple` is serialized as one stream per element,
         /// so each element stream is scalar; using the tuple arity as the dimension would make the codec
         /// read several values from a single-value stream.
-        if (sample_field.getType() == Field::Types::Array)
+        if (const auto * column_array = typeid_cast<const ColumnArray *>(column))
         {
-            for (size_t j = 0; j < column->size(); ++j)
+            const auto & offsets = column_array->getOffsets();
+            for (size_t j = 0; j < offsets.size(); ++j)
+                codec->setAndCheckVectorDimension(offsets[j] - offsets[j - 1]);
+        }
+        else
+        {
+            Field sample_field;
+            column->get(0, sample_field);
+            if (sample_field.getType() == Field::Types::Array)
             {
-                column->get(j, sample_field);
-                codec->setAndCheckVectorDimension(sample_field.safeGet<Array>().size());
+                for (size_t j = 0; j < column->size(); ++j)
+                {
+                    column->get(j, sample_field);
+                    codec->setAndCheckVectorDimension(sample_field.safeGet<Array>().size());
+                }
             }
         }
     }

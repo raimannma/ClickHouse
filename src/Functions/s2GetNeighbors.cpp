@@ -105,7 +105,7 @@ public:
             for (auto & neighbor : neighbors)
             {
                 ++current_offset;
-                dst_data.insert(neighbor.id());
+                dst_data.getData().push_back(neighbor.id());
             }
             dst_offsets[row] = current_offset;
         }

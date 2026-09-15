@@ -62,7 +62,7 @@ public:
                 std::stringstream str; // STYLE_CHECK_ALLOW_STD_STRING_STREAM
                 str.exceptions(std::ios::failbit);
                 str << boost::geometry::wkt(figures[i]);
-                std::string serialized = str.str();
+                const std::string serialized = std::move(str).str();
                 res_column->insertData(serialized.data(), serialized.size());
             }
         }

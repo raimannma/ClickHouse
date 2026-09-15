@@ -87,7 +87,7 @@ class ExtractKeyValuePairs final : public IFunction
 
             offset += pairs_count;
 
-            offsets->insert(offset);
+            offsets->getData().push_back(offset);
         }
 
         keys->validate();

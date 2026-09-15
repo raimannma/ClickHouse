@@ -86,6 +86,7 @@ public:
         }
 
         auto result = ColumnString::create();
+        result->reserve(input_rows_count);
 
         for (size_t i = 0; i < input_rows_count; ++i)
         {

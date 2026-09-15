@@ -155,6 +155,7 @@ ColumnPtr ObfuscateQueryFunction::execute(const ColumnsWithTypeAndName & argumen
     const ColumnPtr col_query = arguments[0].column;
 
     auto col_res = ColumnString::create();
+    col_res->reserve(input_rows_count);
     const std::optional<UInt64> const_seed_hash = (arguments.size() >= 2) ? extractConstSeedFromArg(arguments[1].column) : std::nullopt;
     const KnownIdentifierFunc & known_identifier_func = getKnownIdentifierFunc();
 

@@ -444,12 +444,12 @@ public:
         {
             auto & column_tuple = assert_cast<ColumnTuple &>(data_to);
             IColumn & column_key = column_tuple.getColumn(0);
-            IColumn & column_count = column_tuple.getColumn(1);
-            IColumn & column_error = column_tuple.getColumn(2);
+            auto & column_count = assert_cast<ColumnVector<UInt64> &>(column_tuple.getColumn(1)).getData();
+            auto & column_error = assert_cast<ColumnVector<UInt64> &>(column_tuple.getColumn(2)).getData();
             for (auto &elem : result_vec)
             {
-                column_count.insert(elem.count);
-                column_error.insert(elem.error);
+                column_count.push_back(elem.count);
+                column_error.push_back(elem.error);
                 deserializeAndInsert<is_plain_column>(elem.key, column_key);
             }
         }

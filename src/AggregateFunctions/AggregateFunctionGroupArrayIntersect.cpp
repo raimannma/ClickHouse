@@ -94,9 +94,10 @@ public:
             typename State::Set new_set;
             for (size_t i = 0; i < arr_size; ++i)
             {
-                typename State::Set::LookupResult set_value = set.find(static_cast<T>((*data_column)[offset + i].safeGet<T>()));
+                const T value = static_cast<T>((*data_column)[offset + i].safeGet<T>());
+                typename State::Set::LookupResult set_value = set.find(value);
                 if (set_value != nullptr)
-                    new_set.insert(static_cast<T>((*data_column)[offset + i].safeGet<T>()));
+                    new_set.insert(value);
             }
             set = std::move(new_set);
         }

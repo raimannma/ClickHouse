@@ -41,6 +41,7 @@ public:
     {
         const auto & input_column = *arguments[0].column;
         auto col_res = res_type->createColumn();
+        col_res->reserve(input_rows_count);
 
         for (size_t i = 0; i < input_rows_count; ++i)
         {

@@ -71,10 +71,12 @@ public:
             throw Exception(ErrorCodes::ILLEGAL_COLUMN, "Illegal column {} of argument of function {}", column->getName(), getName());
 
         auto result_column = ColumnString::create();
+        result_column->reserve(input_rows_count);
 
+        String source;
         for (size_t i = 0; i < input_rows_count; ++i)
         {
-            String source{column_concrete->getDataAt(i)};
+            source.assign(column_concrete->getDataAt(i));
             auto demangled = tryDemangle(source.c_str());
             if (demangled)
             {

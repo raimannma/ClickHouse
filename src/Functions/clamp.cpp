@@ -43,6 +43,7 @@ public:
             converted_columns[arg] = castColumn(arguments[arg], result_type)->convertToFullColumnIfConst();
 
         auto result_column = result_type->createColumn();
+        result_column->reserve(input_rows_count);
         for (size_t row_num = 0; row_num < input_rows_count; ++row_num)
         {
             if (converted_columns[1]->compareAt(row_num, row_num, *converted_columns[2], 1) > 0)

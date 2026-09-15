@@ -145,7 +145,7 @@ public:
                 if (hindex != 0)
                 {
                     ++current_offset;
-                    dst_data.insert(hindex);
+                    dst_data.getData().push_back(hindex);
                 }
             }
             dst_offsets[row] = current_offset;

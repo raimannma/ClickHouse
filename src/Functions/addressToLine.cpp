@@ -36,6 +36,7 @@ protected:
     ColumnPtr getResultColumn(const typename ColumnVector<UInt64>::Container & data, size_t input_rows_count) const override
     {
         auto result_column = ColumnString::create();
+        result_column->reserve(input_rows_count);
         for (size_t i = 0; i < input_rows_count; ++i)
         {
             std::string_view res_str = implCached(data[i]);

@@ -164,7 +164,7 @@ public:
 
         MutableColumnPtr keys_data = key_type->createColumn();
         MutableColumnPtr values_data = value_type->createColumn();
-        MutableColumnPtr offsets = DataTypeNumber<IColumn::Offset>().createColumn();
+        auto offsets = ColumnArray::ColumnOffsets::create();
 
         size_t total_elements = input_rows_count * top_N;
         keys_data->reserve(total_elements);
@@ -211,7 +211,7 @@ public:
                 values_data->insertData(reinterpret_cast<const char *>(&res_float), sizeof(res_float));
                 ++current_offset;
             }
-            offsets->insert(current_offset);
+            offsets->getData().push_back(current_offset);
         }
 
         auto nested_column = ColumnArray::create(

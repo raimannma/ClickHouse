@@ -70,7 +70,7 @@ public:
 
         auto latitude = ColumnFloat64::create();
         auto longitude = ColumnFloat64::create();
-        auto offsets = DataTypeNumber<IColumn::Offset>().createColumn();
+        auto offsets = ColumnArray::ColumnOffsets::create();
         offsets->reserve(input_rows_count);
         IColumn::Offset current_offset = 0;
 
@@ -81,7 +81,7 @@ public:
 
             if (!validator.validateCell(h3index))
             {
-                offsets->insert(current_offset);
+                offsets->getData().push_back(current_offset);
                 continue;
             }
 
@@ -91,12 +91,12 @@ public:
 
             for (int vert = 0; vert < boundary.numVerts; ++vert)
             {
-                latitude->insert(radsToDegs(boundary.verts[vert].lat));
-                longitude->insert(radsToDegs(boundary.verts[vert].lng));
+                latitude->getData().push_back(radsToDegs(boundary.verts[vert].lat));
+                longitude->getData().push_back(radsToDegs(boundary.verts[vert].lng));
             }
 
             current_offset += boundary.numVerts;
-            offsets->insert(current_offset);
+            offsets->getData().push_back(current_offset);
         }
 
         return ColumnArray::create(

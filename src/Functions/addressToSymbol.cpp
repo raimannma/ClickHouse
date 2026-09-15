@@ -80,6 +80,7 @@ public:
 
         const typename ColumnVector<UInt64>::Container & data = column_concrete->getData();
         auto result_column = ColumnString::create();
+        result_column->reserve(input_rows_count);
 
         const SymbolIndex & symbol_index = SymbolIndex::instance();
 

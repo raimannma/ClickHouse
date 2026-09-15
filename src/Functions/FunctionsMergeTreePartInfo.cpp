@@ -159,6 +159,7 @@ public:
     ColumnPtr executeImpl(const ColumnsWithTypeAndName & arguments, const DataTypePtr &, size_t input_rows_count) const override
     {
         auto result_column = ColumnUInt8::create();
+        result_column->reserve(input_rows_count);
         const ColumnPtr & input_column = arguments.front().column;
 
         for (size_t i = 0; i < input_rows_count; ++i)

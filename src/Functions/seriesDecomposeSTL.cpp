@@ -80,10 +80,10 @@ public:
 
         ColumnArray::Offset prev_src_offset = 0;
 
+        auto period_ptr = arguments[1].column->convertToFullColumnIfConst();
         for (size_t i = 0; i < input_rows_count; ++i)
         {
             UInt64 period = 0;
-            auto period_ptr = arguments[1].column->convertToFullColumnIfConst();
             if (checkAndGetColumn<ColumnUInt8>(period_ptr.get())
                 || checkAndGetColumn<ColumnUInt16>(period_ptr.get())
                 || checkAndGetColumn<ColumnUInt32>(period_ptr.get())

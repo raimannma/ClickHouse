@@ -308,7 +308,9 @@ public:
             if constexpr (is_extract_raw)
             {
                 auto raw_col = ColumnString::create();
+                raw_col->reserve(input_rows_count);
                 auto serialization = merged_type->getDefaultSerialization();
+                WriteBufferFromOwnString buf;
                 for (size_t i = 0; i < input_rows_count; ++i)
                 {
                     if (!treat_typed_as_always_present && merged->isNullAt(i))
@@ -317,9 +319,10 @@ public:
                     }
                     else
                     {
-                        WriteBufferFromOwnString buf;
+                        buf.restart();
                         serialization->serializeTextJSON(*merged, i, buf, format_settings);
-                        raw_col->insert(buf.str());
+                        const auto & raw = buf.str();
+                        raw_col->insertData(raw.data(), raw.size());
                     }
                 }
                 return raw_col;

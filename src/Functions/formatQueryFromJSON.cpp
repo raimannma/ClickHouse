@@ -290,6 +290,7 @@ public:
     ColumnPtr executeImpl(const ColumnsWithTypeAndName & arguments, const DataTypePtr &, size_t input_rows_count) const override
     {
         auto result = ColumnString::create();
+        result->reserve(input_rows_count);
 
         const auto * json_col = arguments[0].column.get();
         const auto * orig_col = arguments.size() > 1 ? arguments[1].column.get() : nullptr;
@@ -324,14 +325,16 @@ public:
                 String canonical = buf.str();
 
                 auto original = String(orig_col->getDataAt(i));
-                result->insert(formatWithOriginalWhitespaceChecked(canonical, original));
+                const String formatted = formatWithOriginalWhitespaceChecked(canonical, original);
+                result->insertData(formatted.data(), formatted.size());
             }
             else
             {
                 /// One-argument form: canonical formatting.
                 IAST::FormatSettings format_settings(/*one_line=*/true);
                 ast->format(buf, format_settings);
-                result->insert(buf.str());
+                const auto & formatted = buf.str();
+                result->insertData(formatted.data(), formatted.size());
             }
         }
 

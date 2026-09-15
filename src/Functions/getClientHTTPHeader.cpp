@@ -62,10 +62,10 @@ public:
         return std::make_shared<DataTypeString>();
     }
 
-    ColumnPtr executeImpl(const ColumnsWithTypeAndName & arguments, const DataTypePtr & result_type, size_t input_rows_count) const override
+    ColumnPtr executeImpl(const ColumnsWithTypeAndName & arguments, const DataTypePtr &, size_t input_rows_count) const override
     {
         const auto & source = arguments[0].column;
-        auto result = result_type->createColumn();
+        auto result = ColumnString::create();
         result->reserve(input_rows_count);
 
         for (size_t row = 0; row < input_rows_count; ++row)
@@ -73,7 +73,7 @@ public:
             Field header;
             source->get(row, header);
             if (auto it = http_headers.find(header.safeGet<String>()); it != http_headers.end())
-                result->insert(it->second);
+                result->insertData(it->second.data(), it->second.size());
             else
                 result->insertDefault();
         }

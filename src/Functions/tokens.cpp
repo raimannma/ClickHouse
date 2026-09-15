@@ -159,6 +159,7 @@ private:
         offsets_data.resize(input_rows_count);
         size_t tokens_count = 0;
 
+        [[maybe_unused]] String token;
         for (size_t i = 0; i < input_rows_count; ++i)
         {
             std::string_view input = column_input.getDataAt(i);
@@ -168,7 +169,6 @@ private:
                 size_t cur = 0;
                 const char * data = input.data();
                 size_t length = input.size();
-                String token;
 
                 while (cur < length && tokenizer_.nextInStringLike(data, length, cur, token))
                 {

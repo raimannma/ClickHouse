@@ -70,6 +70,7 @@ public:
     ColumnPtr executeImpl(const ColumnsWithTypeAndName & arguments, const DataTypePtr &, size_t input_rows_count) const override
     {
         auto result = ColumnString::create();
+        result->reserve(input_rows_count);
 
         const auto * col = arguments[0].column.get();
 
@@ -87,7 +88,8 @@ public:
             if (max_ast_elements)
                 ast->checkSize(max_ast_elements);
 
-            result->insert(serializeASTToJSON(*ast));
+            const String json = serializeASTToJSON(*ast);
+            result->insertData(json.data(), json.size());
         }
 
         return result;

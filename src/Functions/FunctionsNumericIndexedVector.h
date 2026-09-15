@@ -857,7 +857,7 @@ public:
 
         MutableColumnPtr keys_data = key_type->createColumn();
         MutableColumnPtr values_data = value_type->createColumn();
-        MutableColumnPtr offsets = DataTypeNumber<IColumn::Offset>().createColumn();
+        auto offsets = ColumnArray::ColumnOffsets::create();
 
         PaddedPODArray<typename VectorImpl::IndexType> & keys_pod
             = typeid_cast<ColumnVector<typename VectorImpl::IndexType> &>(*keys_data).getData();
@@ -872,7 +872,7 @@ public:
             auto lhs = reinterpret_cast<const AggregateFunctionGroupNumericIndexedVectorData<VectorImpl> *>(data_ptr);
             UInt64 count = lhs->vector.toIndexValueMap(keys_pod, values_pod);
             res_offset += count;
-            offsets->insert(res_offset);
+            offsets->getData().push_back(res_offset);
         }
         auto nested_column
             = ColumnArray::create(ColumnTuple::create(Columns{std::move(keys_data), std::move(values_data)}), std::move(offsets));
